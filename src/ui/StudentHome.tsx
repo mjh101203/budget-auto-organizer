@@ -1,6 +1,7 @@
 import type { AppState, Team } from '../domain/types'
 import { computeTeamBalances, totalBalance } from '../domain/budget'
 import { formatWon, sumWon, itemAmount } from '../domain/money'
+import { generateBudgetStatus } from '../export'
 
 interface Props {
   state: AppState
@@ -22,6 +23,20 @@ export function StudentHome({ state, team, onNewRequest, onOpenRequest }: Props)
     .filter((r) => r.teamId === team.id)
     .slice()
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+
+  async function handleDownloadBudgetStatus() {
+    const result = await generateBudgetStatus(state, team.id, new Date())
+    if (!result.ok) return
+    const blob = new Blob([result.buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = result.filename
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
 
   return (
     <div className="space-y-6">
@@ -85,14 +100,24 @@ export function StudentHome({ state, team, onNewRequest, onOpenRequest }: Props)
         </table>
       </div>
 
-      <button
-        type="button"
-        data-testid="new-request"
-        className="rounded bg-sky-600 px-4 py-2 text-white"
-        onClick={onNewRequest}
-      >
-        새 구매 요청
-      </button>
+      <div className="flex gap-2">
+        <button
+          type="button"
+          data-testid="new-request"
+          className="rounded bg-sky-600 px-4 py-2 text-white"
+          onClick={onNewRequest}
+        >
+          새 구매 요청
+        </button>
+        <button
+          type="button"
+          data-testid="download-budget-status"
+          className="rounded border border-sky-600 px-4 py-2 text-sky-600"
+          onClick={handleDownloadBudgetStatus}
+        >
+          예산현황 엑셀
+        </button>
+      </div>
     </div>
   )
 }

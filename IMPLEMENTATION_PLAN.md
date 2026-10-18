@@ -1,7 +1,7 @@
 # IMPLEMENTATION PLAN
-> 마지막 갱신: 16:21 (build) · P0 26/26 / P1 5/6 / P2 0/3 (완료 31)
+> 마지막 갱신: 16:35 (build) · P0 26/26 / P1 6/6 / P2 0/3 (완료 32)
 
-현재 코드 상태: 도메인/파서/엑셀/UI 전부(위 이력 참고) 완료 + `e2e/demo.spec.ts`(specs/00 §6 데모 시나리오 전체 — 역할 전환·장바구니 붙여넣기·인식·규정검사·제출·교사승인·품의서 다운로드)까지 녹색. 실시간 지시(UI 최소기능+data-testid+데모 e2e, UNPARSED_LINE 수동 추가, 디바이스마트 할인율 줄 처리, 디바이스마트 HTML 품목 링크 goods/view 추출)는 각각 도착한 iteration으로 완결. `npm run check` 전체(167 유닛 테스트 + e2e 2개) 통과. 남은 건 P1-3(예산현황 엑셀)과 P2(스트레치) 뿐.
+현재 코드 상태: 도메인/파서/엑셀/UI 전부(위 이력 참고) 완료 + `e2e/demo.spec.ts`(specs/00 §6 데모 시나리오 전체 — 역할 전환·장바구니 붙여넣기·인식·규정검사·제출·교사승인·품의서 다운로드)까지 녹색. P1 전부 완료(G마켓 어댑터·UNPARSED_LINE 수동추가·디바이스마트 할인율/링크 보정·교사 집행률 막대·예산현황 엑셀). `npm run check` 전체(170 유닛 테스트 + e2e 2개) 통과. 남은 건 P2(스트레치) 뿐.
 
 ## P0 — 데모 필수 (없으면 발표 불가)
 - [x] 1. 프로젝트 스캐폴딩: Vite + React + TypeScript(strict) + Tailwind 초기화, `src/domain/ src/config/ src/export/ src/store/ src/ui/` 폴더 생성, ESLint 설정, `package.json`에 `dev/build/test` 스크립트. — 완료 기준: `npm install` 성공, `npx tsc --noEmit` 통과, `npx eslint .` 통과, `npx vite build` 성공 (spec: 00-overview.md 10장)
@@ -36,7 +36,7 @@
 - [x] 1c. 디바이스마트 HTML 붙여넣기 품목 링크: 일반 텍스트 매칭(`matchLinkUrl`, 가장 긴 텍스트 우선)이 배너/이벤트 링크 텍스트에 품명이 우연히 포함되면 그 링크(사이트 루트 등)를 상품 링크로 잘못 고를 위험이 있어 사이트 루트가 잡히는 버그로 이어짐(실시간 지시). `links.ts`에 `extractDevicemartItemLinks` 추가 — `a.order_name[href]`(디바이스마트 품명 링크 고유 class)만 문서 순서대로 뽑아 `/goods/view`·`/goods/catalog` 패턴만 남기고, 품목 개수와 일치하면 위치 기반으로 매칭(개수 불일치 시만 기존 텍스트 매칭으로 폴백). — 완료 기준: `devicemart-3.html`+`.txt`로 품목 3개 전부 goods/view 링크(사이트 루트 아님) 확인 테스트 + `links.test.ts`에 썸네일/배너/비상품링크 무시 케이스 (spec: 01-cart-parser.md §3-5, §가정)
 - [x] 1. G마켓 어댑터(3-4단계). `real/gmarket-1.expected.json`은 이미 `_review`(에이전트 생성, 수량 1 가정) 표시로 존재 — 그 가정을 반영해 파서를 맞추고, 결과가 바뀌면 expected.json을 갱신한다. — 완료 기준: `gmarket-1.txt` → 기존/갱신된 expected.json과 일치 (spec: 01-cart-parser.md §3-4)
 - [x] 2. `UNPARSED_LINE` 경고 줄을 품목표에서 [품목으로 추가] 클릭으로 수동 추가. — 완료 기준: UNPARSED_LINE이 있는 입력에서 클릭 시 품목 행 추가되는 테스트 (spec: 05-ui.md §새구매요청 2, 01-cart-parser.md §4)
-- [ ] 3. 팀 예산 집행 현황 엑셀(`src/export/layouts/budgetStatus.ts`, 시트 `예산현황`+`집행내역`) + 학생 홈 [예산현황 엑셀] 버튼. — 완료 기준: 시드 팀 데이터로 집행률·배정/승인/대기/잔액 셀 값 검증 테스트 (spec: 04-excel-export.md P1)
+- [x] 3. 팀 예산 집행 현황 엑셀(`src/export/layouts/budgetStatus.ts`, 시트 `예산현황`+`집행내역`) + 학생 홈 [예산현황 엑셀] 버튼. — 완료 기준: 시드 팀 데이터로 집행률·배정/승인/대기/잔액 셀 값 검증 테스트 (spec: 04-excel-export.md P1)
 - [x] 4. 교사 화면 팀별 집행률 막대 2개(rne-3, club-robot). — 완료 기준: 교사 홈 렌더 시 두 팀의 집행률이 시드 수치로 표시되는 테스트 (spec: 05-ui.md §교사홈 P1)
 
 > 학교 실제 엑셀 양식 채우기(04-excel-export.md P1)는 `specs/fixtures/school-template.xlsx`가 없어 대상 제외. 파일이 생기면 플랜에 추가한다.

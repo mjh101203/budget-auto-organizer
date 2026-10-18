@@ -4,20 +4,13 @@ import { itemAmount, sumWon, formatWon } from '../../domain/money'
 import { attributeCategory, requestCategoryTotals } from '../../domain/budget'
 import { BUDGET_CATEGORIES, BUDGET_TYPE_LABELS } from '../../config/budget'
 import { distributeVat } from '../vat'
+import { formatDate } from '../format'
 
 const FONT_NAME = '맑은 고딕'
 const THIN: ExcelJS.Border = { style: 'thin', color: { argb: 'FF000000' } }
 const BORDERS = { top: THIN, left: THIN, bottom: THIN, right: THIN }
 const HEADER_FILL: ExcelJS.Fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0E0E0' } }
 const MONEY_FORMAT = '#,##0'
-
-function formatDate(iso: string): string {
-  const d = new Date(iso)
-  const y = d.getFullYear()
-  const m = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  return `${y}.${m}.${day}`
-}
 
 function moneyCell(sheet: ExcelJS.Worksheet, ref: string, value: number): ExcelJS.Cell {
   const cell = sheet.getCell(ref)
