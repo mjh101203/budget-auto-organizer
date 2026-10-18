@@ -445,6 +445,93 @@ function validateTotals(
   }
 }
 
+const GMARKET_NAME_LINE = /^\[상품명[:：]\s*(.+?)\]\((https?:\/\/[^)]+)\)/
+const GMARKET_ITEM_AMOUNT = /^상품\s*금액\s*[:：]\s*(\d[\d,]*)\s*원/
+const GMARKET_SUBTOTAL = /^\*\s*상품금액\s*(\d[\d,]*)\s*원$/
+const GMARKET_TOTAL = /^총\s*결제금액\s*(\d[\d,]*)\s*원$/
+const GMARKET_SHIPPING = /^\*\s*배송비\s*(\d[\d,]*)\s*원$/
+
+function isGmarketCart(rawLines: string[]): boolean {
+  return rawLines.some((line) => GMARKET_NAME_LINE.test(line))
+}
+
+function parseGmarketCart(rawLines: string[]): ParseResult {
+  const warnings: ParseWarning[] = []
+  const items: ParsedItem[] = []
+
+  const itemStartIndices = rawLines
+    .map((line, idx) => (GMARKET_NAME_LINE.test(line) ? idx : -1))
+    .filter((idx) => idx >= 0)
+  const summaryStartIdx = rawLines.findIndex((line) => /^최종\s*결제정보/.test(line))
+  const listEndIdx = summaryStartIdx === -1 ? rawLines.length : summaryStartIdx
+
+  itemStartIndices.forEach((startIdx, i) => {
+    const endIdx = i + 1 < itemStartIndices.length ? itemStartIndices[i + 1] : listEndIdx
+    const match = rawLines[startIdx].match(GMARKET_NAME_LINE)
+    if (!match) return
+    const name = match[1].trim()
+    const url = match[2]
+    const lineNo = startIdx + 1
+
+    let amount: number | undefined
+    for (let idx = startIdx + 1; idx < endIdx; idx++) {
+      const amountMatch = rawLines[idx].match(GMARKET_ITEM_AMOUNT)
+      if (amountMatch) {
+        amount = Number(amountMatch[1].replace(/,/g, ''))
+        break
+      }
+    }
+    if (amount === undefined) {
+      warnings.push({ code: 'MISSING_PRICE', line: lineNo, message: '금액을 찾지 못했습니다' })
+      return
+    }
+
+    warnings.push({
+      code: 'MISSING_QTY',
+      line: lineNo,
+      message: '수량을 찾지 못해 1로 처리했습니다',
+    })
+    items.push({ name, url, qty: 1, unitPrice: amount, amount, sourceLine: lineNo })
+  })
+
+  let shippingFee = 0
+  const vatFee = 0
+  let declaredSubtotal: number | undefined
+  let declaredTotal: number | undefined
+  for (let idx = listEndIdx; idx < rawLines.length; idx++) {
+    const line = rawLines[idx]
+    const subtotalMatch = line.match(GMARKET_SUBTOTAL)
+    if (subtotalMatch) {
+      declaredSubtotal = Number(subtotalMatch[1].replace(/,/g, ''))
+      continue
+    }
+    const totalMatch = line.match(GMARKET_TOTAL)
+    if (totalMatch) {
+      declaredTotal = Number(totalMatch[1].replace(/,/g, ''))
+      continue
+    }
+    const shippingMatch = line.match(GMARKET_SHIPPING)
+    if (shippingMatch) {
+      shippingFee = Number(shippingMatch[1].replace(/,/g, ''))
+    }
+  }
+
+  validateTotals(items, shippingFee, vatFee, declaredSubtotal, declaredTotal, warnings)
+  if (items.length === 0) {
+    warnings.push({ code: 'NO_ITEMS', message: '인식된 품목이 없습니다' })
+  }
+
+  return {
+    items,
+    shippingFee,
+    vatFee,
+    ...(declaredSubtotal !== undefined ? { declaredSubtotal } : {}),
+    ...(declaredTotal !== undefined ? { declaredTotal } : {}),
+    warnings,
+    format: 'block',
+  }
+}
+
 function applyLinks(items: ParsedItem[], html: string | undefined): void {
   if (!html) return
   const links = extractLinks(html)
@@ -471,6 +558,12 @@ export function parseCart(text: string, html?: string): ParseResult {
   const devicemartHeaderIdx = findDevicemartHeaderIndex(rawLines)
   if (devicemartHeaderIdx !== -1) {
     const result = parseDevicemartCart(rawLines, devicemartHeaderIdx)
+    applyLinks(result.items, html)
+    return result
+  }
+
+  if (isGmarketCart(rawLines)) {
+    const result = parseGmarketCart(rawLines)
     applyLinks(result.items, html)
     return result
   }

@@ -12,6 +12,8 @@ import devicemart3ExpectedRaw from '../../../specs/fixtures/carts/real/devicemar
 import devicemart3Text from '../../../specs/fixtures/carts/real/devicemart-3.txt?raw'
 import devicemart4ExpectedRaw from '../../../specs/fixtures/carts/real/devicemart-4.expected.json?raw'
 import devicemart4Text from '../../../specs/fixtures/carts/real/devicemart-4.txt?raw'
+import gmarket1ExpectedRaw from '../../../specs/fixtures/carts/real/gmarket-1.expected.json?raw'
+import gmarket1Text from '../../../specs/fixtures/carts/real/gmarket-1.txt?raw'
 import tsvSampleExpectedRaw from '../../../specs/fixtures/carts/tsv-sample.expected.json?raw'
 import tsvSampleText from '../../../specs/fixtures/carts/tsv-sample.txt?raw'
 import { parseCart } from './parseCart'
@@ -127,6 +129,14 @@ describe('parseCart — 디바이스마트 실제 샘플 (절대 약화·skip �
     const result = parseCart(devicemart4Text)
     assertMatchesFixture(result, expected)
     expect(result.warnings).toEqual([])
+  })
+})
+
+describe('parseCart — G마켓 실제 샘플', () => {
+  it('gmarket-1.txt를 gmarket-1.expected.json과 동일하게 인식한다 (수량 버튼만 있어 MISSING_QTY 2개)', () => {
+    const expected = JSON.parse(gmarket1ExpectedRaw) as ExpectedResult
+    const result = parseCart(gmarket1Text)
+    assertMatchesFixture(result, expected)
   })
 })
 
