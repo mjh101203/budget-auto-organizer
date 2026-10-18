@@ -48,3 +48,4 @@
 - `npm run check`는 stop-hook이 종료 시 그대로 재실행해서 검사한다. 테스트 파일이 하나도 없으면 vitest가 "No test files found"로 실패 코드를 뱉으니, 스캐폴딩 직후에도 placeholder 테스트 1개는 바로 커밋해야 한다.
 - `@playwright/test` 버전을 올리면 캐시된 브라우저 리비전 번호가 바뀌어 `Executable doesn't exist` 에러가 난다 — `npx playwright install chromium`을 다시 돌려서 맞는 리비전을 받으면 해결된다.
 - `playwright.config.ts`의 `webServer`는 `npm run preview`(vite preview, dist 서빙)를 쓴다. `npm run check` 순서가 `vite build` → `playwright test`라서 build 산출물이 이미 있는 상태로 preview가 뜬다.
+- 전각 문자(장바구니 파서에서 자주 씀: 전각 공백 U+3000, `！`-`～` 범위, `：` 등)를 소스에 직접 쳐서 넣으면 eslint `no-irregular-whitespace`가 전각 공백을 잡아서 실패한다. 정규식/문자열에 넣을 땐 `　` 같은 유니코드 이스케이프로 쓰면 안전하고 git diff에서도 눈에 보인다.
