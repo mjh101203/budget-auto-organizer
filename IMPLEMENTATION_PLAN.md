@@ -1,11 +1,10 @@
 # IMPLEMENTATION PLAN
-> 마지막 갱신: 14:22 (plan) · P0 25 / P1 4 / P2 3
+> 마지막 갱신: 14:30 (build) · P0 24 / P1 4 / P2 3 (완료 1)
 
-현재 코드 상태: `src/`, `package.json` 없음. 완전히 빈 프로젝트. 아래 1~2번이 최초 스캐폴딩이다.
-(iteration 4 재검증: specs 전체 재확인 + fixture 수치 대조 완료 — 데모/디바이스마트/G마켓 expected.json과 플랜의 수치가 모두 일치. 변경 없음.)
+현재 코드 상태: 스캐폴딩 완료 (Vite+React+TS+Tailwind v4, ESLint flat config, 폴더 구조). 테스트 파이프라인(vitest/playwright) 배선은 다음 작업(P0 2번).
 
 ## P0 — 데모 필수 (없으면 발표 불가)
-- [ ] 1. 프로젝트 스캐폴딩: Vite + React + TypeScript(strict) + Tailwind 초기화, `src/domain/ src/config/ src/export/ src/store/ src/ui/` 폴더 생성, ESLint 설정, `package.json`에 `dev/build/test` 스크립트. — 완료 기준: `npm install` 성공, `npx tsc --noEmit` 통과, `npx eslint .` 통과, `npx vite build` 성공 (spec: 00-overview.md 10장)
+- [x] 1. 프로젝트 스캐폴딩: Vite + React + TypeScript(strict) + Tailwind 초기화, `src/domain/ src/config/ src/export/ src/store/ src/ui/` 폴더 생성, ESLint 설정, `package.json`에 `dev/build/test` 스크립트. — 완료 기준: `npm install` 성공, `npx tsc --noEmit` 통과, `npx eslint .` 통과, `npx vite build` 성공 (spec: 00-overview.md 10장)
 - [ ] 2. 테스트 파이프라인 배선: Vitest 설정(+placeholder 테스트 1개) + Playwright 설정(`npx playwright install chromium` 안내, `e2e/` 폴더, 더미 e2e 1개) + `package.json`에 `npm run check` = `tsc --noEmit && eslint . && vitest run && vite build && playwright test`. — 완료 기준: `npm run check` 전체 통과 (spec: 00-overview.md 10장, CLAUDE.md)
 - [ ] 3. 도메인 타입 정의 `src/domain/types.ts` (Team/Item/PurchaseRequest/AppState, specs/00 7장 그대로) + `src/domain/money.ts` (정수 원 연산, `toLocaleString('ko-KR')+'원'` 포맷 헬퍼). — 완료 기준: `vitest run src/domain/money` money 포맷 단위 테스트 통과 (spec: 00-overview.md §7)
 - [ ] 4. `src/config/budget.ts`: 예산 구분·항목(rne/club), 분류 키워드 묶음, 규정 수치(R3 300000, R4 500000, requireProductLink 등), 금지 키워드(R5/R6) — specs/02 표를 숫자 하드코딩 없이 옮긴다. — 완료 기준: config를 import하는 테스트에서 상수값 확인 (spec: 02-budget-rules.md)
@@ -45,4 +44,4 @@
 - [ ] 3. 인쇄용 화면(Ctrl+P → A4 가로). (spec: 00-overview.md §4 P2)
 
 ## 완료
-(없음 — 코드 미착수)
+- P0-1 프로젝트 스캐폴딩 (iteration 5)
