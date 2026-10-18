@@ -5,6 +5,6 @@ import App from './App'
 describe('App', () => {
   it('renders the service name', () => {
     render(<App />)
-    expect(screen.getByText('예산척척')).toBeInTheDocument()
+    expect(screen.getByText('예산 자동 정리 시스템')).toBeInTheDocument()
   })
 })
