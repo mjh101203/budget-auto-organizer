@@ -1,5 +1,5 @@
 import { classifyTsvHeaderCell, detectFormat, findTsvHeaderLine } from './format'
-import { extractLinks, matchLinkUrl } from './links'
+import { extractDevicemartItemLinks, extractLinks, matchLinkUrl } from './links'
 import {
   isNoiseLine,
   matchDeclaredLabel,
@@ -542,6 +542,18 @@ function applyLinks(items: ParsedItem[], html: string | undefined): void {
   })
 }
 
+function applyDevicemartLinks(items: ParsedItem[], html: string | undefined): void {
+  if (!html) return
+  const hrefs = extractDevicemartItemLinks(html)
+  if (hrefs.length === items.length) {
+    items.forEach((item, i) => {
+      item.url = hrefs[i]
+    })
+    return
+  }
+  applyLinks(items, html)
+}
+
 export function parseCart(text: string, html?: string): ParseResult {
   if (text.trim() === '') {
     return {
@@ -558,7 +570,7 @@ export function parseCart(text: string, html?: string): ParseResult {
   const devicemartHeaderIdx = findDevicemartHeaderIndex(rawLines)
   if (devicemartHeaderIdx !== -1) {
     const result = parseDevicemartCart(rawLines, devicemartHeaderIdx)
-    applyLinks(result.items, html)
+    applyDevicemartLinks(result.items, html)
     return result
   }
 

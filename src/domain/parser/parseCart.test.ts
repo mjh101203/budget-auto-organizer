@@ -9,6 +9,7 @@ import devicemart1Text from '../../../specs/fixtures/carts/real/devicemart-1.txt
 import devicemart2ExpectedRaw from '../../../specs/fixtures/carts/real/devicemart-2.expected.json?raw'
 import devicemart2Text from '../../../specs/fixtures/carts/real/devicemart-2.txt?raw'
 import devicemart3ExpectedRaw from '../../../specs/fixtures/carts/real/devicemart-3.expected.json?raw'
+import devicemart3Html from '../../../specs/fixtures/carts/real/devicemart-3.html?raw'
 import devicemart3Text from '../../../specs/fixtures/carts/real/devicemart-3.txt?raw'
 import devicemart4ExpectedRaw from '../../../specs/fixtures/carts/real/devicemart-4.expected.json?raw'
 import devicemart4Text from '../../../specs/fixtures/carts/real/devicemart-4.txt?raw'
@@ -26,6 +27,7 @@ interface ExpectedItem {
   unitPrice: number
   amount: number
   sourceLine: number
+  url?: string
 }
 
 interface ExpectedResult {
@@ -38,7 +40,11 @@ interface ExpectedResult {
   warnings: { code: string; line?: number }[]
 }
 
-function assertMatchesFixture(result: ParseResult, expected: ExpectedResult): void {
+function assertMatchesFixture(
+  result: ParseResult,
+  expected: ExpectedResult,
+  options: { checkUrl?: boolean } = {},
+): void {
   expect(result.format).toBe(expected.format)
   expect(result.shippingFee).toBe(expected.shippingFee)
   expect(result.vatFee).toBe(expected.vatFee ?? 0)
@@ -56,6 +62,9 @@ function assertMatchesFixture(result: ParseResult, expected: ExpectedResult): vo
       expect(item.spec).toBe(exp.spec)
     } else {
       expect(item.spec).toBeUndefined()
+    }
+    if (options.checkUrl) {
+      expect(item.url).toBe(exp.url)
     }
   })
   expect(result.warnings.map((w) => ({ code: w.code, line: w.line }))).toEqual(
@@ -122,6 +131,16 @@ describe('parseCart — 디바이스마트 실제 샘플 (절대 약화·skip �
     const expected = JSON.parse(devicemart3ExpectedRaw) as ExpectedResult
     const result = parseCart(devicemart3Text)
     assertMatchesFixture(result, expected)
+  })
+
+  it('devicemart-3.html을 같이 넣으면 품목별로 상품 상세(goods/view) 링크가 붙는다 (사이트 루트 아님)', () => {
+    const expected = JSON.parse(devicemart3ExpectedRaw) as ExpectedResult
+    const result = parseCart(devicemart3Text, devicemart3Html)
+    assertMatchesFixture(result, expected, { checkUrl: true })
+    result.items.forEach((item) => {
+      expect(item.url).toMatch(/\/goods\/view\?no=\d+$/)
+      expect(item.url).not.toBe('https://www.devicemart.co.kr/')
+    })
   })
 
   it('devicemart-4.txt를 devicemart-4.expected.json과 동일하게 인식한다 (할인율 줄의 할인 적용 금액을 품목 금액으로 사용)', () => {

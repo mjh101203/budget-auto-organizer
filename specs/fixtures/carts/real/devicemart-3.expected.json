@@ -6,21 +6,24 @@
       "qty": 3,
       "unitPrice": 5900,
       "amount": 17700,
-      "sourceLine": 58
+      "sourceLine": 58,
+      "url": "https://www.devicemart.co.kr/goods/view?no=1330492"
     },
     {
       "name": "아두이노 우노 R4 오픈형 알루미늄 케이스",
       "qty": 2,
       "unitPrice": 17000,
       "amount": 34000,
-      "sourceLine": 70
+      "sourceLine": 70,
+      "url": "https://www.devicemart.co.kr/goods/view?no=15367070"
     },
     {
       "name": "Arduino Uno 투명아크릴 케이스",
       "qty": 1,
       "unitPrice": 1000,
       "amount": 1000,
-      "sourceLine": 78
+      "sourceLine": 78,
+      "url": "https://www.devicemart.co.kr/goods/view?no=1245582"
     }
   ],
   "shippingFee": 2700,

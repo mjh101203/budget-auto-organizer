@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { extractLinks, matchLinkUrl } from './links'
+import { extractDevicemartItemLinks, extractLinks, matchLinkUrl } from './links'
 
 describe('extractLinks', () => {
   it('http(s) 링크이고 글자가 있는 a[href]만 추출한다', () => {
@@ -51,5 +51,31 @@ describe('matchLinkUrl', () => {
       { text: '아두이노 우노 R4 WiFi 호환보드 풀패키지', href: 'https://shop.example/long' },
     ]
     expect(matchLinkUrl('아두이노 우노 R4 WiFi 호환보드', multi)).toBe('https://shop.example/long')
+  })
+})
+
+describe('extractDevicemartItemLinks', () => {
+  it('썸네일 앵커(class 없음)는 건너뛰고 order_name 앵커의 goods/view 링크만 품목 순서대로 뽑는다', () => {
+    const html =
+      '<a href="https://www.devicemart.co.kr/goods/view?no=111"><img src="thumb1.jpg"></a>' +
+      '<a href="https://www.devicemart.co.kr/goods/view?no=111" class="order_name">아두이노 우노</a>' +
+      '<a href="https://www.devicemart.co.kr/goods/view?no=222"><img src="thumb2.jpg"></a>' +
+      '<a href="https://www.devicemart.co.kr/goods/view?no=222" class="order_name">브레드보드</a>'
+    expect(extractDevicemartItemLinks(html)).toEqual([
+      'https://www.devicemart.co.kr/goods/view?no=111',
+      'https://www.devicemart.co.kr/goods/view?no=222',
+    ])
+  })
+
+  it('품명과 글자가 겹치는 배너·내비게이션 링크(사이트 루트 등)는 order_name이 아니므로 무시한다', () => {
+    const html =
+      '<a href="https://www.devicemart.co.kr/" class="promo">신학기 아두이노 우노 특가 이벤트 바로가기</a>' +
+      '<a href="https://www.devicemart.co.kr/goods/view?no=333" class="order_name">아두이노 우노</a>'
+    expect(extractDevicemartItemLinks(html)).toEqual(['https://www.devicemart.co.kr/goods/view?no=333'])
+  })
+
+  it('order_name이어도 상품 상세 패턴(goods/view, goods/catalog)이 아닌 href는 무시한다', () => {
+    const html = '<a href="https://www.devicemart.co.kr/order/cart#none" class="order_name">장바구니</a>'
+    expect(extractDevicemartItemLinks(html)).toEqual([])
   })
 })
