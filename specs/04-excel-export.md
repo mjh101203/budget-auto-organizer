@@ -55,3 +55,6 @@
 
 ## 가정
 <!-- 에이전트가 추가 -->
+- "예산 구분" 표시값은 02-budget-rules.md §1 표의 `rne` R&E 연구비 / `club` 동아리 활동비를 그대로 쓴다(`config/budget.ts`의 `BUDGET_TYPE_LABELS`).
+- "요청자"/"담당(학생)"은 해당 요청 history에서 가장 마지막 submit/resubmit의 actor(없으면 팀장/부장)로 채운다 — 스펙에 명시 없음.
+- "비고"(품목별 사유)는 `request.acknowledgements`에서 `itemId`가 일치하는 항목의 `reason`으로 채운다(없으면 빈칸).

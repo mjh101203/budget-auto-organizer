@@ -1,5 +1,5 @@
 # IMPLEMENTATION PLAN
-> 마지막 갱신: 15:24 (build) · P0 16 / P1 4 / P2 3 (완료 16)
+> 마지막 갱신: 15:31 (build) · P0 17 / P1 4 / P2 3 (완료 17)
 
 현재 코드 상태: 스캐폴딩 + 테스트 파이프라인 + 도메인 타입/money.ts + config/budget.ts + parser/normalize.ts(1단계 정규화) + parser/format.ts(형식 판별, 헤더 셀 분류 export) + parser/parseCart.ts(block/tsv/line 파서 + 디바이스마트 전용 어댑터 + UNPARSED_LINE 탐지, demo-cart·tsv-sample·line-sample·devicemart-1/2/3 fixture 일치, WarningCode 7종 전부 단위 테스트 + 퍼징 테스트) + parser/links.ts(HTML `a[href]` 링크 추출 + 품명 매칭, parseCart에 html 파라미터로 연동) + store/seed.ts(specs/00 §8 시드 데이터: teamA rne-3/teamB club-robot, REQ-0001~0003, nextSeq=4) + domain/classify.ts(키워드 묶음 개수 기반 자동 분류) + domain/budget.ts(항목별 approved/pending/available 잔액 계산 + 배송비·부가세 귀속 + 재제출 pending 제외 + remainingAfterDraft) + domain/rules.ts(checkRequest R1~R12 전부) + domain/workflow.ts(submit/reject/resubmit/approve, {ok,reason} 패턴, 승인 재검사는 approved+자기자신만 반영) + store/index.ts(localStorage persistence, 키 `yesan:v1`, 손상 데이터 시드 복구) 완료. `npm run check` 전체 통과. 다음은 P0 17번(`src/export/` 구매 품의서 엑셀 생성)부터.
 
@@ -20,7 +20,7 @@
 - [x] 14. `src/domain/rules.ts` `checkRequest` (R1~R12 전부). — 완료 기준: 데모 장바구니(8품목, 전부 링크 있음) 기준 R1 error 1개("재료비 잔액 초과 (84,700원 초과)") + R3 warning 1개, 다른 finding 없음. 각 규칙 경계값(299,999/300,000, 499,999/500,000, 잔액 정확히 0) 테스트 통과 (spec: 02-budget-rules.md §규정검사)
 - [x] 15. `src/domain/workflow.ts` submit/approve/reject/resubmit 상태 전이 (throw 대신 `{ok,reason}`). — 완료 기준: specs/03 §표의 모든 성공/실패 케이스 + nextSeq 시드(4)에서 submit 2번→REQ-0004/0005 + "두 대기 요청 중 하나만 승인 가능" 케이스 테스트 통과 (spec: 03-approval.md)
 - [x] 16. `src/store/index.ts` localStorage persistence (키 `yesan:v1`, 최초 로드 시 시드, 저장/복원). — 완료 기준: save→reload 후 상태 동일 테스트, 손상된 데이터일 때 시드로 복구 테스트 (spec: 00-overview.md §10)
-- [ ] 17. `src/export/` 구매 품의서 엑셀 생성(exceljs, `layouts/purchaseOrder.ts`, 부가세 배분 로직). — 완료 기준: 버퍼를 exceljs로 재읽기해서 데모 REQ-0004(품목 7행, 배송비 3,000, 합계 112,000, 소계 "재료비 73,400 / 소모품비 38,600", 지도교사 최윤서) 검증 + devicemart-2/3 부가세 배분 수치 + 링크 셀 하이퍼링크 테스트 통과, 미승인 요청으로 생성 시도 시 실패 (spec: 04-excel-export.md P0)
+- [x] 17. `src/export/` 구매 품의서 엑셀 생성(exceljs, `layouts/purchaseOrder.ts`, 부가세 배분 로직). — 완료 기준: 버퍼를 exceljs로 재읽기해서 데모 REQ-0004(품목 7행, 배송비 3,000, 합계 112,000, 소계 "재료비 73,400 / 소모품비 38,600", 지도교사 최윤서) 검증 + devicemart-2/3 부가세 배분 수치 + 링크 셀 하이퍼링크 테스트 통과, 미승인 요청으로 생성 시도 시 실패 (spec: 04-excel-export.md P0)
 - [ ] 18. UI 앱 셸: 상단 바(서비스명+역할 전환 드롭다운), 화면 상태 라우팅(라이브러리 없음), 하단 [데모 초기화] 틀. — 완료 기준: 역할 전환 시 화면 전환 vitest/컴포넌트 테스트 통과 (spec: 05-ui.md §공통레이아웃)
 - [ ] 19. UI 학생 홈: 총 예산 카드, 항목별 막대 카드(`category-available-<항목명>` testid), 내 팀 요청 목록, [새 구매 요청] 버튼. — 완료 기준: 시드 데이터로 렌더 시 rne-3 재료비 잔액 317,700원 표시 확인 테스트 (spec: 05-ui.md §학생홈)
 - [ ] 20. UI 새 구매 요청 화면: 붙여넣기 영역(`cart-input`, text/plain+text/html 캡처) + [인식](`parse-button`) + 파싱 경고 박스 + 품목표(`item-row`/`item-delete`/`item-url`, 편집 가능) + 배송비(`shipping-fee`) + 합계(`total-amount`). — 완료 기준: 데모 장바구니 붙여넣기→인식 시 품목 8개, 합계 441,000원 표시 테스트 (spec: 05-ui.md §새구매요청 1-3)
@@ -44,6 +44,7 @@
 - [ ] 3. 인쇄용 화면(Ctrl+P → A4 가로). (spec: 00-overview.md §4 P2)
 
 ## 완료
+- P0-17 `src/export/vat.ts`(`distributeVat`: amounts 비율로 vatFee 내림 배분 + 나머지는 금액 큰 품목부터 1원씩) + `src/export/layouts/purchaseOrder.ts`(ExcelJS로 `구매품의서` 시트 — 제목/요청정보/용도/품목표(연번·상품명·단품가격·수량·총가격VAT포함·옵션·링크 하이퍼링크·예산항목·비고=acknowledgement 사유)/배송비행/합계(SUM 수식+result)/항목별 소계(`requestCategoryTotals` 재사용)/결재행) + `src/export/index.ts`(`generatePurchaseOrder(state,requestId,now)` → `{ok:true,buffer,filename}|{ok:false,reason}`, 미승인/존재안함 시 실패, 파일명 `품의서_<짧은팀명>_<요청id>_<승인일YYYYMMDD>.xlsx`+금지문자 치환) + `config/budget.ts`에 `BUDGET_TYPE_LABELS`(rne→"R&E 연구비", club→"동아리 활동비") 추가. `vat.test.ts`(devicemart-2/3 수치, 1:1:1 나머지 배분, vatFee 0, 랜덤 50케이스 합=vatFee) + `index.test.ts`(REQ-0004 가상 데이터로 품목7행/배송비3,000/합계112,000/소계 재료비73,400·소모품비38,600/하이퍼링크/미승인·존재안함 실패) 추가. `npm run check` 전체(152 테스트+e2e) 통과 (iteration 23)
 - P0-1 프로젝트 스캐폴딩 (iteration 5)
 - P0-2 테스트 파이프라인 배선 (iteration 5, stop-hook이 `npm run check` 실패를 잡아내서 같은 iteration에 이어서 완료)
 - P0-3 도메인 타입 `src/domain/types.ts` + `src/domain/money.ts` (iteration 6)

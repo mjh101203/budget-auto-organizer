@@ -7,6 +7,11 @@ export const BUDGET_CATEGORIES: Record<BudgetType, Category[]> = {
 
 export const OTHER_CATEGORY = '기타'
 
+export const BUDGET_TYPE_LABELS: Record<BudgetType, string> = {
+  rne: 'R&E 연구비',
+  club: '동아리 활동비',
+}
+
 interface ClassifyKeywordGroup {
   keywords: string[]
   rne: Category
