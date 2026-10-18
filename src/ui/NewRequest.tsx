@@ -98,6 +98,15 @@ export function NewRequest({ state, team, actor, existingRequest, onDone, onCanc
     ])
   }
 
+  function applySuggestion(suggestions: ReturnType<typeof suggestQuantityFix>) {
+    setItems((prev) =>
+      prev.map((item) => {
+        const suggestion = suggestions.find((s) => s.itemId === item.id)
+        return suggestion ? { ...item, qty: suggestion.suggestedQty } : item
+      }),
+    )
+  }
+
   const draft = { items, shippingFee, vatFee, purpose }
   const excludeRequestId = existingRequest?.id
   const findings = checkRequest(team, state.requests, draft, { excludeRequestId })
@@ -266,11 +275,36 @@ export function NewRequest({ state, team, actor, existingRequest, onDone, onCanc
 
       <div className="rounded border border-slate-200 p-3 space-y-2">
         <h3 className="font-semibold">규정 검사</h3>
-        {errors.map((f, i) => (
-          <div key={`e${i}`} data-testid="finding-error" className="text-red-600 border border-red-300 rounded p-1">
-            {f.message}
-          </div>
-        ))}
+        {errors.map((f, i) => {
+          const suggestions =
+            f.ruleId === 'R1' && f.category
+              ? suggestQuantityFix(items, f.category, -(remaining.byCategory[f.category] ?? 0))
+              : []
+          return (
+            <div key={`e${i}`} data-testid="finding-error" className="text-red-600 border border-red-300 rounded p-1">
+              <div>{f.message}</div>
+              {suggestions.length > 0 && (
+                <div data-testid="budget-fix-suggestion" className="mt-1 text-sm text-slate-700">
+                  <span>
+                    제안:{' '}
+                    {suggestions
+                      .map((s) => `${s.itemName} 수량 ${s.currentQty}→${s.suggestedQty}개`)
+                      .join(', ')}
+                    로 줄이면 ({formatWon(sumWon(suggestions.map((s) => s.reducedAmount)))} 절감)
+                  </span>{' '}
+                  <button
+                    type="button"
+                    data-testid="apply-budget-fix"
+                    className="rounded border border-slate-400 px-2 py-0.5"
+                    onClick={() => applySuggestion(suggestions)}
+                  >
+                    적용
+                  </button>
+                </div>
+              )}
+            </div>
+          )
+        })}
         {warnings.map((f, i) => (
           <div key={`w${i}`} data-testid="finding-warning" className="text-amber-700 border border-amber-300 rounded p-1">
             <div>{f.message}</div>
