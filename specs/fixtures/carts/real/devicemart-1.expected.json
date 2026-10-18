@@ -1,0 +1,17 @@
+{
+  "format": "block",
+  "items": [
+    {
+      "name": "아두이노 호환 12V 1.5A KC 인증 아답터 [SZH-PSU01]",
+      "qty": 1,
+      "unitPrice": 5900,
+      "amount": 5900,
+      "sourceLine": 58
+    }
+  ],
+  "shippingFee": 2700,
+  "vatFee": 590,
+  "declaredSubtotal": 5900,
+  "declaredTotal": 9190,
+  "warnings": []
+}

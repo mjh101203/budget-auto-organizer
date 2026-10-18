@@ -1,0 +1,21 @@
+{
+  "format": "line",
+  "items": [
+    {
+      "name": "LED 5mm 빨강 100개입",
+      "qty": 2,
+      "unitPrice": 1500,
+      "amount": 3000,
+      "sourceLine": 1
+    },
+    {
+      "name": "탄소피막 저항 1/4W 220Ω 100개",
+      "qty": 1,
+      "unitPrice": 1500,
+      "amount": 1500,
+      "sourceLine": 2
+    }
+  ],
+  "shippingFee": 0,
+  "warnings": []
+}

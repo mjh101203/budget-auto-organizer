@@ -1,0 +1,24 @@
+{
+  "format": "block",
+  "items": [
+    {
+      "name": "아두이노 호환 12V 1.5A KC 인증 아답터 [SZH-PSU01]",
+      "qty": 3,
+      "unitPrice": 5900,
+      "amount": 17700,
+      "sourceLine": 58
+    },
+    {
+      "name": "아두이노 우노 R4 오픈형 알루미늄 케이스",
+      "qty": 1,
+      "unitPrice": 17000,
+      "amount": 17000,
+      "sourceLine": 70
+    }
+  ],
+  "shippingFee": 2700,
+  "vatFee": 3470,
+  "declaredSubtotal": 34700,
+  "declaredTotal": 40870,
+  "warnings": []
+}

@@ -1,0 +1,31 @@
+{
+  "format": "block",
+  "items": [
+    {
+      "name": "아두이노 호환 12V 1.5A KC 인증 아답터 [SZH-PSU01]",
+      "qty": 3,
+      "unitPrice": 5900,
+      "amount": 17700,
+      "sourceLine": 58
+    },
+    {
+      "name": "아두이노 우노 R4 오픈형 알루미늄 케이스",
+      "qty": 2,
+      "unitPrice": 17000,
+      "amount": 34000,
+      "sourceLine": 70
+    },
+    {
+      "name": "Arduino Uno 투명아크릴 케이스",
+      "qty": 1,
+      "unitPrice": 1000,
+      "amount": 1000,
+      "sourceLine": 78
+    }
+  ],
+  "shippingFee": 2700,
+  "vatFee": 5270,
+  "declaredSubtotal": 52700,
+  "declaredTotal": 60670,
+  "warnings": []
+}

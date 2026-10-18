@@ -1,0 +1,66 @@
+{
+  "format": "block",
+  "items": [
+    {
+      "name": "아두이노 우노 R4 WiFi 호환보드",
+      "spec": "기본",
+      "qty": 1,
+      "unitPrice": 32000,
+      "amount": 32000,
+      "sourceLine": 4
+    },
+    {
+      "name": "정전용량 토양 수분 센서 v2.0",
+      "qty": 4,
+      "unitPrice": 3300,
+      "amount": 13200,
+      "sourceLine": 11
+    },
+    {
+      "name": "5V 1채널 릴레이 모듈",
+      "qty": 4,
+      "unitPrice": 1800,
+      "amount": 7200,
+      "sourceLine": 17
+    },
+    {
+      "name": "미니 워터펌프 DC 3~6V",
+      "qty": 4,
+      "unitPrice": 4500,
+      "amount": 18000,
+      "sourceLine": 23
+    },
+    {
+      "name": "실리콘 호스 내경 6mm 1m",
+      "qty": 3,
+      "unitPrice": 2000,
+      "amount": 6000,
+      "sourceLine": 29
+    },
+    {
+      "name": "점퍼 케이블 M-M 20cm 40P",
+      "qty": 2,
+      "unitPrice": 2500,
+      "amount": 5000,
+      "sourceLine": 35
+    },
+    {
+      "name": "18650 리튬이온 배터리 3000mAh",
+      "qty": 4,
+      "unitPrice": 6900,
+      "amount": 27600,
+      "sourceLine": 41
+    },
+    {
+      "name": "휴대용 디지털 오실로스코프 2채널 100MHz",
+      "qty": 1,
+      "unitPrice": 329000,
+      "amount": 329000,
+      "sourceLine": 47
+    }
+  ],
+  "shippingFee": 3000,
+  "declaredSubtotal": 438000,
+  "declaredTotal": 441000,
+  "warnings": []
+}

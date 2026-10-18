@@ -1,0 +1,28 @@
+{
+  "format": "tsv",
+  "items": [
+    {
+      "name": "3D 프린터 PLA 필라멘트 1.75mm 1kg 흰색",
+      "qty": 2,
+      "unitPrice": 22000,
+      "amount": 44000,
+      "sourceLine": 2
+    },
+    {
+      "name": "MG996R 메탈기어 서보모터",
+      "qty": 6,
+      "unitPrice": 6900,
+      "amount": 41400,
+      "sourceLine": 3
+    },
+    {
+      "name": "아크릴판 3T 300x400 투명",
+      "qty": 3,
+      "unitPrice": 4800,
+      "amount": 14400,
+      "sourceLine": 4
+    }
+  ],
+  "shippingFee": 0,
+  "warnings": []
+}
