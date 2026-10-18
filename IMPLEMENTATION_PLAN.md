@@ -1,7 +1,7 @@
 # IMPLEMENTATION PLAN
-> 마지막 갱신: 15:41 (build) · P0 24 / P1 4 / P2 3 (완료 24)
+> 마지막 갱신: 15:46 (build) · P0 25/26 / P1 4 / P2 3 (완료 25)
 
-현재 코드 상태: 도메인/파서/엑셀 전부(위 이력 참고)에 더해 `src/ui/`(StudentHome/NewRequest/RequestDetail/TeacherHome/roles.ts)와 `src/App.tsx`(역할 전환 드롭다운 `role-select` + 화면 라우팅 home/new-request/request-detail + 하단 `reset-demo`, store의 loadState/saveState/resetToSeed 연동)까지 완료. iteration 23이 UI 컴포넌트 4개+roles.ts를 작성했지만 App.tsx에 연결하지 못한 채 `wip` 스냅샷으로 남아 있던 것을 이번 iteration에서 전부 와이어링함. `npm run check` 전체(154 테스트+e2e) 통과. 다음은 P0 24b(화면별 전용 컴포넌트 테스트 보강) 또는 P0 25(데모 시나리오 e2e)부터.
+현재 코드 상태: 도메인/파서/엑셀/UI 전부(위 이력 참고) 완료 + `e2e/demo.spec.ts`(specs/00 §6 데모 시나리오 전체 — 역할 전환·장바구니 붙여넣기·인식·규정검사·제출·교사승인·품의서 다운로드)까지 녹색. 실시간 지시(UI 최소기능+data-testid+데모 e2e)는 이번 iteration으로 완결. `npm run check` 전체(154 유닛 테스트 + e2e 2개) 통과. 남은 건 P0-24b(화면별 전용 컴포넌트 테스트 보강, 선택)와 P1/P2 뿐.
 
 ## P0 — 데모 필수 (없으면 발표 불가)
 - [x] 1. 프로젝트 스캐폴딩: Vite + React + TypeScript(strict) + Tailwind 초기화, `src/domain/ src/config/ src/export/ src/store/ src/ui/` 폴더 생성, ESLint 설정, `package.json`에 `dev/build/test` 스크립트. — 완료 기준: `npm install` 성공, `npx tsc --noEmit` 통과, `npx eslint .` 통과, `npx vite build` 성공 (spec: 00-overview.md 10장)
@@ -29,7 +29,7 @@
 - [x] 23. UI 교사 홈(`pending-row`, 승인 대기 목록 오래된 순) + 상세의 [승인](`approve-button`)/[반려](`reject-button`, 사유 모달). — 완료 기준: REQ-0003이 승인 대기 목록에 표시, 승인/반려 동작 후 상태 갱신 테스트 (spec: 05-ui.md §교사홈, 03-approval.md)
 - [x] 24. [데모 초기화](`reset-demo`) 동작 연결 + specs/05 §e2e용 data-testid 전체 실제 DOM에 부여 확인 (브라우저 alert/confirm 미사용). — 완료 기준: 전체 testid 목록이 코드에서 grep되고, 데모 초기화 클릭 시 localStorage가 시드로 복원되는 테스트 (spec: 05-ui.md §공통, §e2e용 data-testid)
 - [ ] 24b. UI 컴포넌트 전용 테스트 보강: StudentHome/NewRequest/RequestDetail/TeacherHome/reset-demo 각각에 대한 단위 컴포넌트 테스트(현재는 App.test.tsx의 역할 전환 테스트로만 간접 커버됨). — 완료 기준: 각 화면 컴포넌트별 최소 1개 렌더/상호작용 테스트 (spec: 05-ui.md)
-- [ ] 25. 데모 시나리오 e2e 테스트 (`e2e/demo.spec.ts`, specs/00 §6 6단계 전부, chromium). — 완료 기준: `npm run e2e` (playwright) 통과 — 학생 김민준 홈 317,700원 → 장바구니 붙여넣기(텍스트+HTML) → 인식 8품목/441,000원 → R1 error+R3 warning → 오실로스코프 삭제 → 112,000원/244,300원 → 제출 REQ-0004 → 교사 최윤서 승인 → 학생 복귀 승인 상태/244,300원 → 품의서 엑셀 다운로드 (spec: 00-overview.md §6)
+- [x] 25. 데모 시나리오 e2e 테스트 (`e2e/demo.spec.ts`, specs/00 §6 6단계 전부, chromium). — 완료 기준: `npm run e2e` (playwright) 통과 — 학생 김민준 홈 317,700원 → 장바구니 붙여넣기(텍스트+HTML) → 인식 8품목/441,000원 → R1 error+R3 warning → 오실로스코프 삭제 → 112,000원/244,300원 → 제출 REQ-0004 → 교사 최윤서 승인 → 학생 복귀 승인 상태/244,300원 → 품의서 엑셀 다운로드 (spec: 00-overview.md §6)
 
 ## P1 — 완성도
 - [ ] 1. G마켓 어댑터(3-4단계). `real/gmarket-1.expected.json`은 이미 `_review`(에이전트 생성, 수량 1 가정) 표시로 존재 — 그 가정을 반영해 파서를 맞추고, 결과가 바뀌면 expected.json을 갱신한다. — 완료 기준: `gmarket-1.txt` → 기존/갱신된 expected.json과 일치 (spec: 01-cart-parser.md §3-4)
@@ -45,6 +45,7 @@
 - [ ] 3. 인쇄용 화면(Ctrl+P → A4 가로). (spec: 00-overview.md §4 P2)
 
 ## 완료
+- P0-25 데모 시나리오 e2e(`e2e/demo.spec.ts`): `new DataTransfer()`+`new ClipboardEvent('paste', ...)`를 브라우저에서 직접 구성해 `cart-input`에 dispatch(텍스트+HTML 동시) → 인식 8품목/441,000원 → R1 error+R3 warning 확인 → 오실로스코프 행(8번째, `item-row` nth(7)) 삭제 → 용도 입력 → 제출 REQ-0004 → 역할 교사로 전환해 `pending-row`에서 승인 → 역할 학생 복귀해 재료비 잔액 244,300원 확인 → `download-po` 클릭해 다운로드 이벤트(.xlsx 파일명) 확인. `item-row`를 `hasText`로 품명 필터링하면 안 됨(품명이 `<input value>`라 Playwright의 텍스트 매칭에 안 잡힘) → 순서 기반 `.nth()`로 해결. e2e 전용 Node 타입(tsconfig.node.json, DOM lib 없음)이라 `DataTransfer`/`ClipboardEvent` 전역 타입이 없어서 `globalThis as unknown as {...}` 캐스팅으로 우회. `npm run check` 전체(154 테스트+e2e 2개) 통과 (iteration 27, 실시간 지시 완결)
 - P0-17 `src/export/vat.ts`(`distributeVat`: amounts 비율로 vatFee 내림 배분 + 나머지는 금액 큰 품목부터 1원씩) + `src/export/layouts/purchaseOrder.ts`(ExcelJS로 `구매품의서` 시트 — 제목/요청정보/용도/품목표(연번·상품명·단품가격·수량·총가격VAT포함·옵션·링크 하이퍼링크·예산항목·비고=acknowledgement 사유)/배송비행/합계(SUM 수식+result)/항목별 소계(`requestCategoryTotals` 재사용)/결재행) + `src/export/index.ts`(`generatePurchaseOrder(state,requestId,now)` → `{ok:true,buffer,filename}|{ok:false,reason}`, 미승인/존재안함 시 실패, 파일명 `품의서_<짧은팀명>_<요청id>_<승인일YYYYMMDD>.xlsx`+금지문자 치환) + `config/budget.ts`에 `BUDGET_TYPE_LABELS`(rne→"R&E 연구비", club→"동아리 활동비") 추가. `vat.test.ts`(devicemart-2/3 수치, 1:1:1 나머지 배분, vatFee 0, 랜덤 50케이스 합=vatFee) + `index.test.ts`(REQ-0004 가상 데이터로 품목7행/배송비3,000/합계112,000/소계 재료비73,400·소모품비38,600/하이퍼링크/미승인·존재안함 실패) 추가. `npm run check` 전체(152 테스트+e2e) 통과 (iteration 23)
 - P0-1 프로젝트 스캐폴딩 (iteration 5)
 - P0-2 테스트 파이프라인 배선 (iteration 5, stop-hook이 `npm run check` 실패를 잡아내서 같은 iteration에 이어서 완료)
