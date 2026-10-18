@@ -30,4 +30,35 @@ describe('classifyItem', () => {
   it('spec 필드도 매칭에 포함된다', () => {
     expect(classifyItem('부품', '아두이노 호환 보드', 'rne')).toBe('재료비')
   })
+
+  it('영문 품명(부품류)도 키워드로 분류된다 - rne 재료비 / club 물품구입비', () => {
+    const names = [
+      'Arduino UNO Q',
+      'ESP32-S3',
+      'Raspberry Pi 5',
+      'Servo Motor SG90',
+      'Breadboard',
+      'LED',
+      'OLED Display',
+      'Ultrasonic Sensor',
+    ]
+    for (const name of names) {
+      expect(classifyItem(name, undefined, 'rne')).toBe('재료비')
+      expect(classifyItem(name, undefined, 'club')).toBe('물품구입비')
+    }
+  })
+
+  it('영문 품명(소모품류)도 키워드로 분류된다 - rne 소모품비 / club 물품구입비', () => {
+    const names = ['Jumper Wire', 'Li-ion Battery']
+    for (const name of names) {
+      expect(classifyItem(name, undefined, 'rne')).toBe('소모품비')
+      expect(classifyItem(name, undefined, 'club')).toBe('물품구입비')
+    }
+  })
+
+  it('영문 품명이 소문자·혼합 표기여도 동일하게 분류된다', () => {
+    expect(classifyItem('arduino uno q', undefined, 'rne')).toBe('재료비')
+    expect(classifyItem('RASPBERRY pi 5', undefined, 'rne')).toBe('재료비')
+    expect(classifyItem('jumper WIRE m-m', undefined, 'rne')).toBe('소모품비')
+  })
 })

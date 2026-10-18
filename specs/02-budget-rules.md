@@ -72,3 +72,4 @@
 - 분류 매칭은 순수 부분 문자열 일치(substring, 겹침 허용)로 구현. "MG996R 메탈기어 서보모터" 예시는 본문 설명상 부품 매칭 2개(서보, 모터)지만, "메탈기어"에 "기어"도 부품 키워드로 포함돼 실제로는 3개가 매칭된다. 최종 분류 결과(물품구입비)에는 영향 없으므로 그대로 둔다.
 - `checkRequest` 시그니처는 `(team, requests, draft, options?)`로 구현(스펙 표기의 `now` 파라미터는 생략). R1~R12 중 현재 시각을 쓰는 규칙이 없어 들고 있어도 쓸 데가 없는 죽은 파라미터가 되기 때문. 향후 시간 기반 규칙이 추가되면 다시 넣는다. `options.excludeRequestId`는 재제출 시 자기 자신의 기존 pending 제외용(기존 `remainingAfterDraft`와 동일한 패턴).
 - R6(식비) 표의 메시지 예("R&E 연구비로 식비 집행 불가")는 rne 전용이고 club 쪽 문구는 스펙에 없어 직접 작성: club+행사·체험비(warning) "식비는 행사·체험비 지출 — 사유를 입력하세요", club+그 외(error) "동아리 활동비로 식비 집행 불가 (행사·체험비 항목만 가능)".
+- 분류 키워드 묶음(`CLASSIFY_KEYWORD_GROUPS`)은 한글 키워드 외에 영문 품명(Arduino, ESP32, Raspberry Pi, Servo Motor, Breadboard, Jumper Wire, Battery 등)도 매칭하도록 영문 키워드를 같이 둔다. `classifyItem`이 `toLowerCase()`로 비교하므로 대소문자·혼합 표기(ArduinoUNO, RASPBERRY 등)는 키워드를 소문자로만 등록해도 전부 매칭된다(실시간 지시, iteration 47).

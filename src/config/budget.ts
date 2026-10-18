@@ -25,6 +25,8 @@ export const CLASSIFY_KEYWORD_GROUPS: ClassifyKeywordGroup[] = [
       '펌프', '저항', '콘덴서', '커패시터', 'LED', '트랜지스터', '기판', 'PCB', '브레드보드',
       '필라멘트', '아크릴', '프로파일', '기어', '베어링', '디스플레이', '카메라', '오실로스코프',
       '멀티미터', '전원공급기', '납땜인두',
+      'arduino', 'uno', 'raspberry', 'servo', 'motor', 'sensor', 'module', 'display',
+      'breadboard', 'oled',
     ],
     rne: '재료비',
     club: '물품구입비',
@@ -33,6 +35,7 @@ export const CLASSIFY_KEYWORD_GROUPS: ClassifyKeywordGroup[] = [
     keywords: [
       '점퍼', '케이블', '전선', '납', '플럭스', '테이프', '글루', '건전지', '배터리', '호스',
       '나사', '볼트', '너트', '수축튜브', '케이블타이', '장갑', '사포',
+      'jumper', 'wire', 'cable', 'battery',
     ],
     rne: '소모품비',
     club: '물품구입비',
