@@ -54,4 +54,19 @@ describe('NewRequest', () => {
     expect(screen.getAllByTestId('item-row')).toHaveLength(2)
     expect(screen.queryByTestId('add-unparsed-line')).not.toBeInTheDocument()
   })
+
+  it('지난번 주문(duplicateFrom)을 넘기면 품목·배송비·용도가 새 초안으로 채워진다', () => {
+    const state = createSeedState()
+    const team = state.teams.find((t) => t.id === 'rne-3')!
+    const source = state.requests.find((r) => r.id === 'REQ-0001')!
+
+    render(
+      <NewRequest state={state} team={team} actor="김민준" duplicateFrom={source} onDone={vi.fn()} onCancel={vi.fn()} />,
+    )
+
+    expect(screen.getByText('지난번 주문 다시 담기')).toBeInTheDocument()
+    expect(screen.getAllByTestId('item-row')).toHaveLength(source.items.length)
+    expect(screen.getByTestId('shipping-fee')).toHaveValue(source.shippingFee)
+    expect(screen.getByTestId('purpose-input')).toHaveValue(source.purpose)
+  })
 })

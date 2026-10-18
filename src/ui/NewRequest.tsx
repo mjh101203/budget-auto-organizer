@@ -17,6 +17,7 @@ interface Props {
   team: Team
   actor: string
   existingRequest?: PurchaseRequest
+  duplicateFrom?: PurchaseRequest
   onDone: (state: AppState, requestId: string) => void
   onCancel: () => void
 }
@@ -27,13 +28,15 @@ function nextDraftItemId(): string {
   return `draft-item-${draftItemSeq}`
 }
 
-export function NewRequest({ state, team, actor, existingRequest, onDone, onCancel }: Props) {
+export function NewRequest({ state, team, actor, existingRequest, duplicateFrom, onDone, onCancel }: Props) {
   const [cartText, setCartText] = useState('')
   const [cartHtml, setCartHtml] = useState('')
-  const [items, setItems] = useState<Item[]>(existingRequest?.items ?? [])
-  const [shippingFee, setShippingFee] = useState(existingRequest?.shippingFee ?? 0)
-  const [vatFee, setVatFee] = useState(existingRequest?.vatFee ?? 0)
-  const [purpose, setPurpose] = useState(existingRequest?.purpose ?? '')
+  const [items, setItems] = useState<Item[]>(
+    existingRequest?.items ?? duplicateFrom?.items.map((item) => ({ ...item, id: nextDraftItemId() })) ?? [],
+  )
+  const [shippingFee, setShippingFee] = useState(existingRequest?.shippingFee ?? duplicateFrom?.shippingFee ?? 0)
+  const [vatFee, setVatFee] = useState(existingRequest?.vatFee ?? duplicateFrom?.vatFee ?? 0)
+  const [purpose, setPurpose] = useState(existingRequest?.purpose ?? duplicateFrom?.purpose ?? '')
   const [acknowledgements, setAcknowledgements] = useState<PurchaseRequest['acknowledgements']>(
     existingRequest?.acknowledgements ?? [],
   )
@@ -147,7 +150,9 @@ export function NewRequest({ state, team, actor, existingRequest, onDone, onCanc
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-bold">{existingRequest ? '구매 요청 수정 후 재제출' : '새 구매 요청'}</h2>
+      <h2 className="text-xl font-bold">
+        {existingRequest ? '구매 요청 수정 후 재제출' : duplicateFrom ? '지난번 주문 다시 담기' : '새 구매 요청'}
+      </h2>
 
       <div>
         <textarea

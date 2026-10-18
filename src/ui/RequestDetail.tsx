@@ -12,6 +12,7 @@ interface Props {
   actor: string
   onStateChange: (state: AppState) => void
   onResubmit: () => void
+  onDuplicate: () => void
   onBack: () => void
 }
 
@@ -21,7 +22,7 @@ function statusLabel(status: PurchaseRequest['status']): string {
   return '반려'
 }
 
-export function RequestDetail({ state, request, team, isTeacher, actor, onStateChange, onResubmit, onBack }: Props) {
+export function RequestDetail({ state, request, team, isTeacher, actor, onStateChange, onResubmit, onDuplicate, onBack }: Props) {
   const [showRejectForm, setShowRejectForm] = useState(false)
   const [rejectReason, setRejectReason] = useState('')
   const [actionError, setActionError] = useState<string | undefined>(undefined)
@@ -134,6 +135,12 @@ export function RequestDetail({ state, request, team, isTeacher, actor, onStateC
       {request.status === 'approved' && !isTeacher && (
         <button type="button" data-testid="download-po" className="rounded bg-emerald-600 px-3 py-1 text-white" onClick={handleDownload}>
           품의서 엑셀
+        </button>
+      )}
+
+      {!isTeacher && (
+        <button type="button" data-testid="duplicate-request" className="rounded border border-slate-400 px-3 py-1" onClick={onDuplicate}>
+          지난번 주문 다시 담기
         </button>
       )}
 

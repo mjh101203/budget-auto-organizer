@@ -16,6 +16,7 @@ function App() {
   const [screen, setScreen] = useState<Screen>('home')
   const [currentRequestId, setCurrentRequestId] = useState<string | undefined>(undefined)
   const [resubmitTarget, setResubmitTarget] = useState<PurchaseRequest | undefined>(undefined)
+  const [duplicateSource, setDuplicateSource] = useState<PurchaseRequest | undefined>(undefined)
 
   function applyState(next: AppState) {
     saveState(next)
@@ -27,6 +28,7 @@ function App() {
     setScreen('home')
     setCurrentRequestId(undefined)
     setResubmitTarget(undefined)
+    setDuplicateSource(undefined)
   }
 
   function handleResetDemo() {
@@ -35,6 +37,7 @@ function App() {
     setScreen('home')
     setCurrentRequestId(undefined)
     setResubmitTarget(undefined)
+    setDuplicateSource(undefined)
   }
 
   const actor = actorForRole(role)
@@ -76,6 +79,7 @@ function App() {
             team={team}
             onNewRequest={() => {
               setResubmitTarget(undefined)
+              setDuplicateSource(undefined)
               setScreen('new-request')
             }}
             onOpenRequest={openRequest}
@@ -87,9 +91,11 @@ function App() {
             team={team}
             actor={actor}
             existingRequest={resubmitTarget}
+            duplicateFrom={duplicateSource}
             onDone={(next, requestId) => {
               applyState(next)
               setResubmitTarget(undefined)
+              setDuplicateSource(undefined)
               setCurrentRequestId(requestId)
               setScreen('request-detail')
             }}
@@ -106,6 +112,12 @@ function App() {
             onStateChange={applyState}
             onResubmit={() => {
               setResubmitTarget(currentRequest)
+              setDuplicateSource(undefined)
+              setScreen('new-request')
+            }}
+            onDuplicate={() => {
+              setDuplicateSource(currentRequest)
+              setResubmitTarget(undefined)
               setScreen('new-request')
             }}
             onBack={() => setScreen('home')}

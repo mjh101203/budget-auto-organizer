@@ -1,7 +1,7 @@
 # IMPLEMENTATION PLAN
-> 마지막 갱신: 16:38 (build) · P0 26/26 / P1 6/6 / P2 1/3 (완료 33)
+> 마지막 갱신: 16:41 (build) · P0 26/26 / P1 6/6 / P2 2/3 (완료 34)
 
-현재 코드 상태: 도메인/파서/엑셀/UI 전부(위 이력 참고) 완료 + `e2e/demo.spec.ts`(specs/00 §6 데모 시나리오 전체 — 역할 전환·장바구니 붙여넣기·인식·규정검사·제출·교사승인·품의서 다운로드)까지 녹색. P1 전부 완료(G마켓 어댑터·UNPARSED_LINE 수동추가·디바이스마트 할인율/링크 보정·교사 집행률 막대·예산현황 엑셀). P2-1(예산 맞추기 추천)도 완료. `npm run check` 전체(176 유닛 테스트 + e2e 2개) 통과. 남은 건 P2(스트레치) 2개뿐.
+현재 코드 상태: 도메인/파서/엑셀/UI 전부(위 이력 참고) 완료 + `e2e/demo.spec.ts`(specs/00 §6 데모 시나리오 전체 — 역할 전환·장바구니 붙여넣기·인식·규정검사·제출·교사승인·품의서 다운로드)까지 녹색. P1 전부 완료(G마켓 어댑터·UNPARSED_LINE 수동추가·디바이스마트 할인율/링크 보정·교사 집행률 막대·예산현황 엑셀). P2-1(예산 맞추기 추천)·P2-2(요청 복제)도 완료. `npm run check` 전체(178 유닛 테스트 + e2e 2개) 통과. 남은 건 P2(스트레치) 1개뿐(인쇄용 화면).
 
 ## P0 — 데모 필수 (없으면 발표 불가)
 - [x] 1. 프로젝트 스캐폴딩: Vite + React + TypeScript(strict) + Tailwind 초기화, `src/domain/ src/config/ src/export/ src/store/ src/ui/` 폴더 생성, ESLint 설정, `package.json`에 `dev/build/test` 스크립트. — 완료 기준: `npm install` 성공, `npx tsc --noEmit` 통과, `npx eslint .` 통과, `npx vite build` 성공 (spec: 00-overview.md 10장)
@@ -43,7 +43,7 @@
 
 ## P2 — 스트레치 (시간 남으면)
 - [x] 1. 예산 맞추기 추천: 항목 잔액 초과 시 어떤 품목 수량을 줄이면 맞는지 제안. (spec: 00-overview.md §4 P2)
-- [ ] 2. 요청 복제("지난번 주문 다시 담기"). (spec: 00-overview.md §4 P2)
+- [x] 2. 요청 복제("지난번 주문 다시 담기"). (spec: 00-overview.md §4 P2)
 - [ ] 3. 인쇄용 화면(Ctrl+P → A4 가로). (spec: 00-overview.md §4 P2)
 
 ## 완료

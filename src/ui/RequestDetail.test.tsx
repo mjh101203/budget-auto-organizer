@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { RequestDetail } from './RequestDetail'
 import { createSeedState } from '../store/seed'
@@ -18,6 +18,7 @@ describe('RequestDetail', () => {
         actor="김민준"
         onStateChange={vi.fn()}
         onResubmit={vi.fn()}
+        onDuplicate={vi.fn()}
         onBack={vi.fn()}
       />,
     )
@@ -40,11 +41,36 @@ describe('RequestDetail', () => {
         actor="김민준"
         onStateChange={vi.fn()}
         onResubmit={vi.fn()}
+        onDuplicate={vi.fn()}
         onBack={vi.fn()}
       />,
     )
 
     expect(screen.getByTestId('status-badge')).toHaveTextContent('승인')
     expect(screen.getByTestId('download-po')).toBeEnabled()
+  })
+
+  it('[지난번 주문 다시 담기] 클릭 시 onDuplicate가 호출된다', () => {
+    const state = createSeedState()
+    const request = state.requests.find((r) => r.id === 'REQ-0001')!
+    const team = state.teams.find((t) => t.id === request.teamId)!
+    const onDuplicate = vi.fn()
+
+    render(
+      <RequestDetail
+        state={state}
+        request={request}
+        team={team}
+        isTeacher={false}
+        actor="김민준"
+        onStateChange={vi.fn()}
+        onResubmit={vi.fn()}
+        onDuplicate={onDuplicate}
+        onBack={vi.fn()}
+      />,
+    )
+
+    fireEvent.click(screen.getByTestId('duplicate-request'))
+    expect(onDuplicate).toHaveBeenCalledTimes(1)
   })
 })
