@@ -1,7 +1,8 @@
 # IMPLEMENTATION PLAN
-> 마지막 갱신: 13:13 (plan) · P0 25 / P1 4 / P2 3
+> 마지막 갱신: 14:22 (plan) · P0 25 / P1 4 / P2 3
 
 현재 코드 상태: `src/`, `package.json` 없음. 완전히 빈 프로젝트. 아래 1~2번이 최초 스캐폴딩이다.
+(iteration 4 재검증: specs 전체 재확인 + fixture 수치 대조 완료 — 데모/디바이스마트/G마켓 expected.json과 플랜의 수치가 모두 일치. 변경 없음.)
 
 ## P0 — 데모 필수 (없으면 발표 불가)
 - [ ] 1. 프로젝트 스캐폴딩: Vite + React + TypeScript(strict) + Tailwind 초기화, `src/domain/ src/config/ src/export/ src/store/ src/ui/` 폴더 생성, ESLint 설정, `package.json`에 `dev/build/test` 스크립트. — 완료 기준: `npm install` 성공, `npx tsc --noEmit` 통과, `npx eslint .` 통과, `npx vite build` 성공 (spec: 00-overview.md 10장)
