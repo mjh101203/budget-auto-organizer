@@ -3,6 +3,12 @@ import demoCartExpectedRaw from '../../../specs/fixtures/carts/demo-cart.expecte
 import demoCartText from '../../../specs/fixtures/carts/demo-cart.txt?raw'
 import lineSampleExpectedRaw from '../../../specs/fixtures/carts/line-sample.expected.json?raw'
 import lineSampleText from '../../../specs/fixtures/carts/line-sample.txt?raw'
+import devicemart1ExpectedRaw from '../../../specs/fixtures/carts/real/devicemart-1.expected.json?raw'
+import devicemart1Text from '../../../specs/fixtures/carts/real/devicemart-1.txt?raw'
+import devicemart2ExpectedRaw from '../../../specs/fixtures/carts/real/devicemart-2.expected.json?raw'
+import devicemart2Text from '../../../specs/fixtures/carts/real/devicemart-2.txt?raw'
+import devicemart3ExpectedRaw from '../../../specs/fixtures/carts/real/devicemart-3.expected.json?raw'
+import devicemart3Text from '../../../specs/fixtures/carts/real/devicemart-3.txt?raw'
 import tsvSampleExpectedRaw from '../../../specs/fixtures/carts/tsv-sample.expected.json?raw'
 import tsvSampleText from '../../../specs/fixtures/carts/tsv-sample.txt?raw'
 import { parseCart } from './parseCart'
@@ -72,6 +78,27 @@ describe('parseCart — line 형식', () => {
   it('line-sample.txt를 line-sample.expected.json과 동일하게 인식한다', () => {
     const expected = JSON.parse(lineSampleExpectedRaw) as ExpectedResult
     const result = parseCart(lineSampleText)
+    assertMatchesFixture(result, expected)
+  })
+})
+
+describe('parseCart — 디바이스마트 실제 샘플 (절대 약화·skip 금지)', () => {
+  it('devicemart-1.txt를 devicemart-1.expected.json과 동일하게 인식한다', () => {
+    const expected = JSON.parse(devicemart1ExpectedRaw) as ExpectedResult
+    const result = parseCart(devicemart1Text)
+    assertMatchesFixture(result, expected)
+  })
+
+  it('devicemart-2.txt를 devicemart-2.expected.json과 동일하게 인식한다 (품목 2개, 부가세 3,470, 배송비 2,700, 경고 없음)', () => {
+    const expected = JSON.parse(devicemart2ExpectedRaw) as ExpectedResult
+    const result = parseCart(devicemart2Text)
+    assertMatchesFixture(result, expected)
+    expect(result.warnings).toEqual([])
+  })
+
+  it('devicemart-3.txt를 devicemart-3.expected.json과 동일하게 인식한다', () => {
+    const expected = JSON.parse(devicemart3ExpectedRaw) as ExpectedResult
+    const result = parseCart(devicemart3Text)
     assertMatchesFixture(result, expected)
   })
 })

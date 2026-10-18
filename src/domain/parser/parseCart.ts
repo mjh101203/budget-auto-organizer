@@ -253,6 +253,136 @@ function parseLineItems(entries: LineEntry[], warnings: ParseWarning[]): ParsedI
   return items
 }
 
+function isDevicemartHeaderLine(text: string): boolean {
+  return text.includes('주문상품') && text.includes('수량') && text.includes('상품금액')
+}
+
+function findDevicemartHeaderIndex(rawLines: string[]): number {
+  return rawLines.findIndex(isDevicemartHeaderLine)
+}
+
+function isDevicemartIgnoredLine(text: string): boolean {
+  const trimmed = text.trim()
+  if (trimmed === '') return true
+  if (/^[-+=]$/.test(trimmed)) return true
+  if (text.includes('마일리지')) return true
+  if (text.includes('삭제')) return true
+  if (trimmed === '본사') return true
+  if (text.includes('택배')) return true
+  if (trimmed === '변경') return true
+  if (/원\s*\(선불\)|원\s*\(착불\)/.test(text)) return true
+  return false
+}
+
+function collapseSpaces(text: string): string {
+  return text.replace(/ {2,}/g, ' ').trim()
+}
+
+type DevicemartLabel = 'subtotal' | 'vat' | 'shipping' | 'total'
+
+const DEVICEMART_LABELS: [RegExp, DevicemartLabel][] = [
+  [/^상품\s*주문\s*금액$/, 'subtotal'],
+  [/^부가세$/, 'vat'],
+  [/^배송비$/, 'shipping'],
+  [/^결제\s*예정금액$/, 'total'],
+]
+
+function matchDevicemartLabel(text: string): DevicemartLabel | undefined {
+  const trimmed = text.trim()
+  return DEVICEMART_LABELS.find(([pattern]) => pattern.test(trimmed))?.[1]
+}
+
+function parseDevicemartCart(rawLines: string[], headerIdx: number): ParseResult {
+  const warnings: ParseWarning[] = []
+
+  const totalLabelIdx = rawLines.findIndex(
+    (line, idx) => idx > headerIdx && matchDevicemartLabel(line) === 'total',
+  )
+  let endIdx = rawLines.length - 1
+  if (totalLabelIdx !== -1) {
+    const valueIdx = rawLines.findIndex(
+      (line, idx) => idx > totalLabelIdx && parseAmount(line) !== undefined,
+    )
+    if (valueIdx !== -1) endIdx = valueIdx
+  }
+
+  const rangeEntries: LineEntry[] = []
+  for (let idx = headerIdx + 1; idx <= endIdx; idx++) {
+    rangeEntries.push({ lineNo: idx + 1, text: rawLines[idx] })
+  }
+  const filtered = rangeEntries.filter((entry) => !isDevicemartIgnoredLine(entry.text))
+
+  const items: ParsedItem[] = []
+  let shippingFee = 0
+  let vatFee = 0
+  let declaredSubtotal: number | undefined
+  let declaredTotal: number | undefined
+
+  let i = 0
+  while (i < filtered.length) {
+    const entry = filtered[i]
+    const label = matchDevicemartLabel(entry.text)
+    if (label) {
+      i++
+      const valueEntry = filtered[i]
+      const value = valueEntry ? parseAmount(valueEntry.text) : undefined
+      if (value !== undefined) {
+        if (label === 'subtotal') declaredSubtotal = value
+        else if (label === 'vat') vatFee = value
+        else if (label === 'shipping') shippingFee = value
+        else declaredTotal = value
+        i++
+      }
+      continue
+    }
+
+    if (entry.text.includes('\t')) {
+      const name = collapseSpaces(entry.text.split('\t')[0])
+      i++
+      let qty = 1
+      if (filtered[i] && /^\d+$/.test(filtered[i].text.trim())) {
+        qty = Number(filtered[i].text.trim())
+        i++
+      } else {
+        warnings.push({
+          code: 'MISSING_QTY',
+          line: entry.lineNo,
+          message: '수량을 찾지 못해 1로 처리했습니다',
+        })
+      }
+
+      const amountEntry = filtered[i]
+      const amount = amountEntry ? parseAmount(amountEntry.text) : undefined
+      if (amount === undefined) {
+        warnings.push({ code: 'MISSING_PRICE', line: entry.lineNo, message: '금액을 찾지 못했습니다' })
+        continue
+      }
+      i++
+
+      const unitPrice = computeLineUnitPrice(amount, qty, entry.lineNo, warnings)
+      items.push({ name, qty, unitPrice, amount, sourceLine: entry.lineNo })
+      continue
+    }
+
+    i++
+  }
+
+  validateTotals(items, shippingFee, vatFee, declaredSubtotal, declaredTotal, warnings)
+  if (items.length === 0) {
+    warnings.push({ code: 'NO_ITEMS', message: '인식된 품목이 없습니다' })
+  }
+
+  return {
+    items,
+    shippingFee,
+    vatFee,
+    ...(declaredSubtotal !== undefined ? { declaredSubtotal } : {}),
+    ...(declaredTotal !== undefined ? { declaredTotal } : {}),
+    warnings,
+    format: 'block',
+  }
+}
+
 function validateTotals(
   items: ParsedItem[],
   shippingFee: number,
@@ -290,6 +420,12 @@ export function parseCart(text: string, html?: string): ParseResult {
   }
 
   const rawLines = normalizeLines(text)
+
+  const devicemartHeaderIdx = findDevicemartHeaderIndex(rawLines)
+  if (devicemartHeaderIdx !== -1) {
+    return parseDevicemartCart(rawLines, devicemartHeaderIdx)
+  }
+
   const kinds = classifyLines(rawLines)
 
   let shippingFee = 0
