@@ -49,3 +49,4 @@
 - `@playwright/test` 버전을 올리면 캐시된 브라우저 리비전 번호가 바뀌어 `Executable doesn't exist` 에러가 난다 — `npx playwright install chromium`을 다시 돌려서 맞는 리비전을 받으면 해결된다.
 - `playwright.config.ts`의 `webServer`는 `npm run preview`(vite preview, dist 서빙)를 쓴다. `npm run check` 순서가 `vite build` → `playwright test`라서 build 산출물이 이미 있는 상태로 preview가 뜬다.
 - 전각 문자(장바구니 파서에서 자주 씀: 전각 공백 U+3000, `！`-`～` 범위, `：` 등)를 소스에 직접 쳐서 넣으면 eslint `no-irregular-whitespace`가 전각 공백을 잡아서 실패한다. 정규식/문자열에 넣을 땐 `　` 같은 유니코드 이스케이프로 쓰면 안전하고 git diff에서도 눈에 보인다.
+- 테스트에서 `specs/fixtures/`의 `.txt`/`.json`을 읽을 때 `node:fs`를 쓰면 `tsconfig.app.json`(`src/`용, 브라우저 전용)에 `"node"` 타입이 없어서 `tsc -b`가 에러 낸다. 대신 `import text from '....txt?raw'`(Vite raw import) + `JSON.parse`로 읽으면 타입 추가 없이 된다.
