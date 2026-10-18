@@ -1,7 +1,7 @@
 # IMPLEMENTATION PLAN
-> 마지막 갱신: 15:31 (build) · P0 17 / P1 4 / P2 3 (완료 17)
+> 마지막 갱신: 15:41 (build) · P0 24 / P1 4 / P2 3 (완료 24)
 
-현재 코드 상태: 스캐폴딩 + 테스트 파이프라인 + 도메인 타입/money.ts + config/budget.ts + parser/normalize.ts(1단계 정규화) + parser/format.ts(형식 판별, 헤더 셀 분류 export) + parser/parseCart.ts(block/tsv/line 파서 + 디바이스마트 전용 어댑터 + UNPARSED_LINE 탐지, demo-cart·tsv-sample·line-sample·devicemart-1/2/3 fixture 일치, WarningCode 7종 전부 단위 테스트 + 퍼징 테스트) + parser/links.ts(HTML `a[href]` 링크 추출 + 품명 매칭, parseCart에 html 파라미터로 연동) + store/seed.ts(specs/00 §8 시드 데이터: teamA rne-3/teamB club-robot, REQ-0001~0003, nextSeq=4) + domain/classify.ts(키워드 묶음 개수 기반 자동 분류) + domain/budget.ts(항목별 approved/pending/available 잔액 계산 + 배송비·부가세 귀속 + 재제출 pending 제외 + remainingAfterDraft) + domain/rules.ts(checkRequest R1~R12 전부) + domain/workflow.ts(submit/reject/resubmit/approve, {ok,reason} 패턴, 승인 재검사는 approved+자기자신만 반영) + store/index.ts(localStorage persistence, 키 `yesan:v1`, 손상 데이터 시드 복구) 완료. `npm run check` 전체 통과. 다음은 P0 17번(`src/export/` 구매 품의서 엑셀 생성)부터.
+현재 코드 상태: 도메인/파서/엑셀 전부(위 이력 참고)에 더해 `src/ui/`(StudentHome/NewRequest/RequestDetail/TeacherHome/roles.ts)와 `src/App.tsx`(역할 전환 드롭다운 `role-select` + 화면 라우팅 home/new-request/request-detail + 하단 `reset-demo`, store의 loadState/saveState/resetToSeed 연동)까지 완료. iteration 23이 UI 컴포넌트 4개+roles.ts를 작성했지만 App.tsx에 연결하지 못한 채 `wip` 스냅샷으로 남아 있던 것을 이번 iteration에서 전부 와이어링함. `npm run check` 전체(154 테스트+e2e) 통과. 다음은 P0 24b(화면별 전용 컴포넌트 테스트 보강) 또는 P0 25(데모 시나리오 e2e)부터.
 
 ## P0 — 데모 필수 (없으면 발표 불가)
 - [x] 1. 프로젝트 스캐폴딩: Vite + React + TypeScript(strict) + Tailwind 초기화, `src/domain/ src/config/ src/export/ src/store/ src/ui/` 폴더 생성, ESLint 설정, `package.json`에 `dev/build/test` 스크립트. — 완료 기준: `npm install` 성공, `npx tsc --noEmit` 통과, `npx eslint .` 통과, `npx vite build` 성공 (spec: 00-overview.md 10장)
@@ -21,13 +21,14 @@
 - [x] 15. `src/domain/workflow.ts` submit/approve/reject/resubmit 상태 전이 (throw 대신 `{ok,reason}`). — 완료 기준: specs/03 §표의 모든 성공/실패 케이스 + nextSeq 시드(4)에서 submit 2번→REQ-0004/0005 + "두 대기 요청 중 하나만 승인 가능" 케이스 테스트 통과 (spec: 03-approval.md)
 - [x] 16. `src/store/index.ts` localStorage persistence (키 `yesan:v1`, 최초 로드 시 시드, 저장/복원). — 완료 기준: save→reload 후 상태 동일 테스트, 손상된 데이터일 때 시드로 복구 테스트 (spec: 00-overview.md §10)
 - [x] 17. `src/export/` 구매 품의서 엑셀 생성(exceljs, `layouts/purchaseOrder.ts`, 부가세 배분 로직). — 완료 기준: 버퍼를 exceljs로 재읽기해서 데모 REQ-0004(품목 7행, 배송비 3,000, 합계 112,000, 소계 "재료비 73,400 / 소모품비 38,600", 지도교사 최윤서) 검증 + devicemart-2/3 부가세 배분 수치 + 링크 셀 하이퍼링크 테스트 통과, 미승인 요청으로 생성 시도 시 실패 (spec: 04-excel-export.md P0)
-- [ ] 18. UI 앱 셸: 상단 바(서비스명+역할 전환 드롭다운), 화면 상태 라우팅(라이브러리 없음), 하단 [데모 초기화] 틀. — 완료 기준: 역할 전환 시 화면 전환 vitest/컴포넌트 테스트 통과 (spec: 05-ui.md §공통레이아웃)
-- [ ] 19. UI 학생 홈: 총 예산 카드, 항목별 막대 카드(`category-available-<항목명>` testid), 내 팀 요청 목록, [새 구매 요청] 버튼. — 완료 기준: 시드 데이터로 렌더 시 rne-3 재료비 잔액 317,700원 표시 확인 테스트 (spec: 05-ui.md §학생홈)
-- [ ] 20. UI 새 구매 요청 화면: 붙여넣기 영역(`cart-input`, text/plain+text/html 캡처) + [인식](`parse-button`) + 파싱 경고 박스 + 품목표(`item-row`/`item-delete`/`item-url`, 편집 가능) + 배송비(`shipping-fee`) + 합계(`total-amount`). — 완료 기준: 데모 장바구니 붙여넣기→인식 시 품목 8개, 합계 441,000원 표시 테스트 (spec: 05-ui.md §새구매요청 1-3)
-- [ ] 21. UI 규정 검사 패널(`finding-error`/`finding-warning`, 경고 사유 입력) + 항목별 "현재→이번 요청 후 잔액" 표 + [제출](`submit-button`) 활성/비활성 로직 + 용도(`purpose-input`). — 완료 기준: 오실로스코프 삭제 전/후 finding 표시·제출 버튼 활성 상태 변화 테스트 (spec: 05-ui.md §새구매요청 4-5)
-- [ ] 22. UI 요청 상세 화면(`request-id`, `status-badge`, 이력 타임라인, 반려 시 사유+재제출, 승인 시 [품의서 엑셀] `download-po`). — 완료 기준: REQ-0002(반려) 상세에 사유 표시, REQ-0001(승인) 상세에 다운로드 버튼 활성 테스트 (spec: 05-ui.md §요청상세, 03-approval.md)
-- [ ] 23. UI 교사 홈(`pending-row`, 승인 대기 목록 오래된 순) + 상세의 [승인](`approve-button`)/[반려](`reject-button`, 사유 모달). — 완료 기준: REQ-0003이 승인 대기 목록에 표시, 승인/반려 동작 후 상태 갱신 테스트 (spec: 05-ui.md §교사홈, 03-approval.md)
-- [ ] 24. [데모 초기화](`reset-demo`) 동작 연결 + specs/05 §e2e용 data-testid 전체 실제 DOM에 부여 확인 (브라우저 alert/confirm 미사용). — 완료 기준: 전체 testid 목록이 코드에서 grep되고, 데모 초기화 클릭 시 localStorage가 시드로 복원되는 테스트 (spec: 05-ui.md §공통, §e2e용 data-testid)
+- [x] 18. UI 앱 셸: 상단 바(서비스명+역할 전환 드롭다운), 화면 상태 라우팅(라이브러리 없음), 하단 [데모 초기화] 틀. — 완료 기준: 역할 전환 시 화면 전환 vitest/컴포넌트 테스트 통과 (spec: 05-ui.md §공통레이아웃)
+- [x] 19. UI 학생 홈: 총 예산 카드, 항목별 막대 카드(`category-available-<항목명>` testid), 내 팀 요청 목록, [새 구매 요청] 버튼. — 완료 기준: 시드 데이터로 렌더 시 rne-3 재료비 잔액 317,700원 표시 확인 테스트 (spec: 05-ui.md §학생홈)
+- [x] 20. UI 새 구매 요청 화면: 붙여넣기 영역(`cart-input`, text/plain+text/html 캡처) + [인식](`parse-button`) + 파싱 경고 박스 + 품목표(`item-row`/`item-delete`/`item-url`, 편집 가능) + 배송비(`shipping-fee`) + 합계(`total-amount`). — 완료 기준: 데모 장바구니 붙여넣기→인식 시 품목 8개, 합계 441,000원 표시 테스트 (spec: 05-ui.md §새구매요청 1-3)
+- [x] 21. UI 규정 검사 패널(`finding-error`/`finding-warning`, 경고 사유 입력) + 항목별 "현재→이번 요청 후 잔액" 표 + [제출](`submit-button`) 활성/비활성 로직 + 용도(`purpose-input`). — 완료 기준: 오실로스코프 삭제 전/후 finding 표시·제출 버튼 활성 상태 변화 테스트 (spec: 05-ui.md §새구매요청 4-5)
+- [x] 22. UI 요청 상세 화면(`request-id`, `status-badge`, 이력 타임라인, 반려 시 사유+재제출, 승인 시 [품의서 엑셀] `download-po`). — 완료 기준: REQ-0002(반려) 상세에 사유 표시, REQ-0001(승인) 상세에 다운로드 버튼 활성 테스트 (spec: 05-ui.md §요청상세, 03-approval.md)
+- [x] 23. UI 교사 홈(`pending-row`, 승인 대기 목록 오래된 순) + 상세의 [승인](`approve-button`)/[반려](`reject-button`, 사유 모달). — 완료 기준: REQ-0003이 승인 대기 목록에 표시, 승인/반려 동작 후 상태 갱신 테스트 (spec: 05-ui.md §교사홈, 03-approval.md)
+- [x] 24. [데모 초기화](`reset-demo`) 동작 연결 + specs/05 §e2e용 data-testid 전체 실제 DOM에 부여 확인 (브라우저 alert/confirm 미사용). — 완료 기준: 전체 testid 목록이 코드에서 grep되고, 데모 초기화 클릭 시 localStorage가 시드로 복원되는 테스트 (spec: 05-ui.md §공통, §e2e용 data-testid)
+- [ ] 24b. UI 컴포넌트 전용 테스트 보강: StudentHome/NewRequest/RequestDetail/TeacherHome/reset-demo 각각에 대한 단위 컴포넌트 테스트(현재는 App.test.tsx의 역할 전환 테스트로만 간접 커버됨). — 완료 기준: 각 화면 컴포넌트별 최소 1개 렌더/상호작용 테스트 (spec: 05-ui.md)
 - [ ] 25. 데모 시나리오 e2e 테스트 (`e2e/demo.spec.ts`, specs/00 §6 6단계 전부, chromium). — 완료 기준: `npm run e2e` (playwright) 통과 — 학생 김민준 홈 317,700원 → 장바구니 붙여넣기(텍스트+HTML) → 인식 8품목/441,000원 → R1 error+R3 warning → 오실로스코프 삭제 → 112,000원/244,300원 → 제출 REQ-0004 → 교사 최윤서 승인 → 학생 복귀 승인 상태/244,300원 → 품의서 엑셀 다운로드 (spec: 00-overview.md §6)
 
 ## P1 — 완성도
