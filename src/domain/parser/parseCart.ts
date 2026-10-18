@@ -1,4 +1,5 @@
 import { classifyTsvHeaderCell, detectFormat, findTsvHeaderLine } from './format'
+import { extractLinks, matchLinkUrl } from './links'
 import {
   isNoiseLine,
   matchDeclaredLabel,
@@ -429,9 +430,17 @@ function validateTotals(
   }
 }
 
-export function parseCart(text: string, html?: string): ParseResult {
-  void html
+function applyLinks(items: ParsedItem[], html: string | undefined): void {
+  if (!html) return
+  const links = extractLinks(html)
+  if (links.length === 0) return
+  items.forEach((item) => {
+    const url = matchLinkUrl(item.name, links)
+    if (url) item.url = url
+  })
+}
 
+export function parseCart(text: string, html?: string): ParseResult {
   if (text.trim() === '') {
     return {
       items: [],
@@ -446,7 +455,9 @@ export function parseCart(text: string, html?: string): ParseResult {
 
   const devicemartHeaderIdx = findDevicemartHeaderIndex(rawLines)
   if (devicemartHeaderIdx !== -1) {
-    return parseDevicemartCart(rawLines, devicemartHeaderIdx)
+    const result = parseDevicemartCart(rawLines, devicemartHeaderIdx)
+    applyLinks(result.items, html)
+    return result
   }
 
   const kinds = classifyLines(rawLines)
@@ -480,6 +491,8 @@ export function parseCart(text: string, html?: string): ParseResult {
   if (items.length === 0) {
     warnings.push({ code: 'NO_ITEMS', message: '인식된 품목이 없습니다' })
   }
+
+  applyLinks(items, html)
 
   return {
     items,

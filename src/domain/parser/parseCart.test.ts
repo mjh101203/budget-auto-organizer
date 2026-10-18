@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import demoCartExpectedRaw from '../../../specs/fixtures/carts/demo-cart.expected.json?raw'
+import demoCartHtml from '../../../specs/fixtures/carts/demo-cart.html?raw'
 import demoCartText from '../../../specs/fixtures/carts/demo-cart.txt?raw'
 import lineSampleExpectedRaw from '../../../specs/fixtures/carts/line-sample.expected.json?raw'
 import lineSampleText from '../../../specs/fixtures/carts/line-sample.txt?raw'
@@ -63,6 +64,23 @@ describe('parseCart — block 형식', () => {
     const expected = JSON.parse(demoCartExpectedRaw) as ExpectedResult
     const result = parseCart(demoCartText)
     assertMatchesFixture(result, expected)
+  })
+})
+
+describe('parseCart — 링크 추출 (3-5단계)', () => {
+  it('demo-cart.html을 같이 넣으면 8개 품목 전부 https://shop.example/item/1~8이 붙는다', () => {
+    const result = parseCart(demoCartText, demoCartHtml)
+    expect(result.items).toHaveLength(8)
+    result.items.forEach((item, i) => {
+      expect(item.url).toBe(`https://shop.example/item/${i + 1}`)
+    })
+  })
+
+  it('html이 없으면 url이 비어 있다', () => {
+    const result = parseCart(demoCartText)
+    result.items.forEach((item) => {
+      expect(item.url).toBeUndefined()
+    })
   })
 })
 
