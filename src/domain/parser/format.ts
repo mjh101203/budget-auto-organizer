@@ -1,22 +1,35 @@
 import { parseAmount, parseQty } from './normalize'
 import type { CartFormat } from './parseCart.types'
 
-const TSV_HEADER_GROUPS = [
-  /상품명|품명|제품명|품목/,
-  /옵션|규격|사양/,
-  /수량/,
-  /단가|판매가|가격/,
-  /금액|합계|소계|주문금액/,
+export type TsvColumnType = 'name' | 'spec' | 'qty' | 'price' | 'amount'
+
+const TSV_HEADER_GROUPS: [TsvColumnType, RegExp][] = [
+  ['qty', /수량/],
+  ['price', /단가|판매가|가격/],
+  ['amount', /금액|합계|소계|주문금액/],
+  ['spec', /옵션|규격|사양/],
+  ['name', /상품명|품명|제품명|품목/],
 ]
 
+export function classifyTsvHeaderCell(cell: string): TsvColumnType | undefined {
+  const found = TSV_HEADER_GROUPS.find(([, pattern]) => pattern.test(cell))
+  return found?.[0]
+}
+
 function matchedHeaderGroupCount(line: string): number {
-  return TSV_HEADER_GROUPS.filter((group) => group.test(line)).length
+  const cells = line.split('\t')
+  const types = new Set(cells.map(classifyTsvHeaderCell).filter((t): t is TsvColumnType => t !== undefined))
+  return types.size
 }
 
 function isTsvFormat(contentLines: string[]): boolean {
   const tabLines = contentLines.filter((line) => line.includes('\t'))
   if (tabLines.length < 2) return false
   return tabLines.some((line) => matchedHeaderGroupCount(line) >= 2)
+}
+
+export function findTsvHeaderLine(lines: string[]): string | undefined {
+  return lines.filter((line) => line.includes('\t')).find((line) => matchedHeaderGroupCount(line) >= 2)
 }
 
 function isLineFormat(contentLines: string[]): boolean {

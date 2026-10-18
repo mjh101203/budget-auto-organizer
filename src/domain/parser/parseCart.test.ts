@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import demoCartExpectedRaw from '../../../specs/fixtures/carts/demo-cart.expected.json?raw'
 import demoCartText from '../../../specs/fixtures/carts/demo-cart.txt?raw'
+import lineSampleExpectedRaw from '../../../specs/fixtures/carts/line-sample.expected.json?raw'
+import lineSampleText from '../../../specs/fixtures/carts/line-sample.txt?raw'
+import tsvSampleExpectedRaw from '../../../specs/fixtures/carts/tsv-sample.expected.json?raw'
+import tsvSampleText from '../../../specs/fixtures/carts/tsv-sample.txt?raw'
 import { parseCart } from './parseCart'
 import type { ParseResult } from './parseCart.types'
 
@@ -52,6 +56,22 @@ describe('parseCart — block 형식', () => {
   it('demo-cart.txt를 demo-cart.expected.json과 동일하게 인식한다', () => {
     const expected = JSON.parse(demoCartExpectedRaw) as ExpectedResult
     const result = parseCart(demoCartText)
+    assertMatchesFixture(result, expected)
+  })
+})
+
+describe('parseCart — tsv 형식', () => {
+  it('tsv-sample.txt를 tsv-sample.expected.json과 동일하게 인식한다', () => {
+    const expected = JSON.parse(tsvSampleExpectedRaw) as ExpectedResult
+    const result = parseCart(tsvSampleText)
+    assertMatchesFixture(result, expected)
+  })
+})
+
+describe('parseCart — line 형식', () => {
+  it('line-sample.txt를 line-sample.expected.json과 동일하게 인식한다', () => {
+    const expected = JSON.parse(lineSampleExpectedRaw) as ExpectedResult
+    const result = parseCart(lineSampleText)
     assertMatchesFixture(result, expected)
   })
 })

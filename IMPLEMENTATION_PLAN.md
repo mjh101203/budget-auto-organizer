@@ -1,7 +1,7 @@
 # IMPLEMENTATION PLAN
-> 마지막 갱신: 14:46 (build) · P0 19 / P1 4 / P2 3 (완료 6)
+> 마지막 갱신: 14:51 (build) · P0 18 / P1 4 / P2 3 (완료 7)
 
-현재 코드 상태: 스캐폴딩 + 테스트 파이프라인 + 도메인 타입/money.ts + config/budget.ts + parser/normalize.ts(1단계 정규화) + parser/format.ts(형식 판별) + parser/parseCart.ts(block 파서, tsv/line은 아직 items:[] + NO_ITEMS만 반환) 완료. `npm run check` 전체 통과. 다음은 P0 7번(line 파서 + tsv 파서)부터.
+현재 코드 상태: 스캐폴딩 + 테스트 파이프라인 + 도메인 타입/money.ts + config/budget.ts + parser/normalize.ts(1단계 정규화) + parser/format.ts(형식 판별, 헤더 셀 분류 export) + parser/parseCart.ts(block/tsv/line 파서 전부 구현, tsv-sample·line-sample fixture 일치) 완료. `npm run check` 전체 통과. 다음은 P0 8번(디바이스마트 어댑터)부터.
 
 ## P0 — 데모 필수 (없으면 발표 불가)
 - [x] 1. 프로젝트 스캐폴딩: Vite + React + TypeScript(strict) + Tailwind 초기화, `src/domain/ src/config/ src/export/ src/store/ src/ui/` 폴더 생성, ESLint 설정, `package.json`에 `dev/build/test` 스크립트. — 완료 기준: `npm install` 성공, `npx tsc --noEmit` 통과, `npx eslint .` 통과, `npx vite build` 성공 (spec: 00-overview.md 10장)
@@ -10,7 +10,7 @@
 - [x] 4. `src/config/budget.ts`: 예산 구분·항목(rne/club), 분류 키워드 묶음, 규정 수치(R3 300000, R4 500000, requireProductLink 등), 금지 키워드(R5/R6) — specs/02 표를 숫자 하드코딩 없이 옮긴다. — 완료 기준: config를 import하는 테스트에서 상수값 확인 (spec: 02-budget-rules.md)
 - [x] 5. `src/domain/parser/normalize.ts` (1단계 정규화: 전각→반각, 금액/수량 표기, 배송비, 합계 줄 감지, 잡음 줄 제거). — 완료 기준: 01-cart-parser.md 1단계의 모든 표기 예시가 각각 테스트 케이스로 통과 (spec: 01-cart-parser.md §1)
 - [x] 6. 형식 판별(tsv/line/block) + block 파서(3단계) `src/domain/parser/parseCart.ts`. — 완료 기준: `specs/fixtures/carts/demo-cart.txt` → `demo-cart.expected.json`과 일치 (품목 8개, 배송비 3000, declaredSubtotal 438000, declaredTotal 441000, warnings 없음) (spec: 01-cart-parser.md §2~3)
-- [ ] 7. line 파서(3-2단계) + tsv 파서. — 완료 기준: `line-sample.txt`/`tsv-sample.txt`가 각각 expected.json과 일치 (spec: 01-cart-parser.md §3-2)
+- [x] 7. line 파서(3-2단계) + tsv 파서. — 완료 기준: `line-sample.txt`/`tsv-sample.txt`가 각각 expected.json과 일치 (spec: 01-cart-parser.md §3-2)
 - [ ] 8. 디바이스마트 어댑터(3-3단계). — 완료 기준: `real/devicemart-1.txt`, `devicemart-2.txt`(품목 2개, 부가세 3,470, 배송비 2,700, 경고 없음), `devicemart-3.txt` 전부 expected.json과 일치. 이 테스트는 절대 약화·skip 금지 (spec: 01-cart-parser.md §3-3)
 - [ ] 9. 4단계 검증: `QTY_PRICE_MISMATCH`/`TOTAL_MISMATCH`/`UNPARSED_LINE`/`EMPTY_INPUT`/`NO_ITEMS`/`MISSING_QTY`/`MISSING_PRICE` + `parseCart`가 어떤 입력에도 throw하지 않는 퍼징 테스트(랜덤 문자열 100개). — 완료 기준: 각 WarningCode에 대한 단위 테스트 + 퍼징 테스트 통과 (spec: 01-cart-parser.md §4)
 - [ ] 10. 링크 추출 `src/domain/parser/links.ts` (`a[href]` 추출, 품명 매칭) + 붙여넣기 HTML 연동. — 완료 기준: `demo-cart.html`+`demo-cart.txt`를 같이 넣으면 8개 품목 전부 `https://shop.example/item/1`…`/8` url이 붙음 (spec: 01-cart-parser.md §3-5)
@@ -50,3 +50,4 @@
 - P0-4 `src/config/budget.ts` 예산 구분·항목·분류 키워드·규정 수치 (iteration 7)
 - P0-5 `src/domain/parser/normalize.ts` 1단계 정규화(전각→반각, 금액/수량 표기, 배송비, 합계 줄 라벨, 잡음 줄) (iteration 8)
 - P0-6 형식 판별(`src/domain/parser/format.ts`) + block 파서(`src/domain/parser/parseCart.ts`), demo-cart fixture 일치 (iteration 9)
+- P0-7 line 파서(3-2단계, 마지막 원 금액 + x/수량 토큰 위치로 품명 추출) + tsv 파서(헤더 셀 타입 분류 후 열 매핑), tsv-sample/line-sample fixture 일치 (iteration 11)
