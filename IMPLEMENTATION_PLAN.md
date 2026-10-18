@@ -1,5 +1,5 @@
 # IMPLEMENTATION PLAN
-> 마지막 갱신: 15:54 (build) · P0 25/26 / P1 4 / P2 3 (완료 25)
+> 마지막 갱신: 15:58 (build) · P0 25/26 / P1 4 / P2 3 (완료 25)
 
 현재 코드 상태: 도메인/파서/엑셀/UI 전부(위 이력 참고) 완료 + `e2e/demo.spec.ts`(specs/00 §6 데모 시나리오 전체 — 역할 전환·장바구니 붙여넣기·인식·규정검사·제출·교사승인·품의서 다운로드)까지 녹색. 실시간 지시(UI 최소기능+data-testid+데모 e2e)는 이번 iteration으로 완결. `npm run check` 전체(154 유닛 테스트 + e2e 2개) 통과. 남은 건 P0-24b(화면별 전용 컴포넌트 테스트 보강, 선택)와 P1/P2 뿐.
 
@@ -28,7 +28,7 @@
 - [x] 22. UI 요청 상세 화면(`request-id`, `status-badge`, 이력 타임라인, 반려 시 사유+재제출, 승인 시 [품의서 엑셀] `download-po`). — 완료 기준: REQ-0002(반려) 상세에 사유 표시, REQ-0001(승인) 상세에 다운로드 버튼 활성 테스트 (spec: 05-ui.md §요청상세, 03-approval.md)
 - [x] 23. UI 교사 홈(`pending-row`, 승인 대기 목록 오래된 순) + 상세의 [승인](`approve-button`)/[반려](`reject-button`, 사유 모달). — 완료 기준: REQ-0003이 승인 대기 목록에 표시, 승인/반려 동작 후 상태 갱신 테스트 (spec: 05-ui.md §교사홈, 03-approval.md)
 - [x] 24. [데모 초기화](`reset-demo`) 동작 연결 + specs/05 §e2e용 data-testid 전체 실제 DOM에 부여 확인 (브라우저 alert/confirm 미사용). — 완료 기준: 전체 testid 목록이 코드에서 grep되고, 데모 초기화 클릭 시 localStorage가 시드로 복원되는 테스트 (spec: 05-ui.md §공통, §e2e용 data-testid)
-- [ ] 24b. UI 컴포넌트 전용 테스트 보강: NewRequest/RequestDetail/TeacherHome/reset-demo 각각에 대한 단위 컴포넌트 테스트(StudentHome은 완료, 나머지는 App.test.tsx의 역할 전환 테스트로만 간접 커버됨). — 완료 기준: 각 화면 컴포넌트별 최소 1개 렌더/상호작용 테스트 (spec: 05-ui.md)
+- [ ] 24b. UI 컴포넌트 전용 테스트 보강 나머지: NewRequest 단위 컴포넌트 테스트(붙여넣기→인식→품목표 플로우). StudentHome/TeacherHome/RequestDetail은 완료. — 완료 기준: NewRequest 렌더/상호작용 테스트 1개 (spec: 05-ui.md)
 - [x] 25. 데모 시나리오 e2e 테스트 (`e2e/demo.spec.ts`, specs/00 §6 6단계 전부, chromium). — 완료 기준: `npm run e2e` (playwright) 통과 — 학생 김민준 홈 317,700원 → 장바구니 붙여넣기(텍스트+HTML) → 인식 8품목/441,000원 → R1 error+R3 warning → 오실로스코프 삭제 → 112,000원/244,300원 → 제출 REQ-0004 → 교사 최윤서 승인 → 학생 복귀 승인 상태/244,300원 → 품의서 엑셀 다운로드 (spec: 00-overview.md §6)
 
 ## P1 — 완성도
