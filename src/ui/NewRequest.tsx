@@ -2,6 +2,8 @@ import { useState } from 'react'
 import type { ClipboardEvent } from 'react'
 import type { AppState, Item, PurchaseRequest, Team } from '../domain/types'
 import { parseCart } from '../domain/parser/parseCart'
+import { parseAmount } from '../domain/parser/normalize'
+import type { ParseWarning } from '../domain/parser/parseCart.types'
 import { classifyItem } from '../domain/classify'
 import { checkRequest } from '../domain/rules'
 import { remainingAfterDraft } from '../domain/budget'
@@ -34,7 +36,8 @@ export function NewRequest({ state, team, actor, existingRequest, onDone, onCanc
   const [acknowledgements, setAcknowledgements] = useState<PurchaseRequest['acknowledgements']>(
     existingRequest?.acknowledgements ?? [],
   )
-  const [parseWarnings, setParseWarnings] = useState<string[]>([])
+  const [parseWarnings, setParseWarnings] = useState<ParseWarning[]>([])
+  const [parsedLines, setParsedLines] = useState<string[]>([])
   const [submitError, setSubmitError] = useState<string | undefined>(undefined)
 
   function handlePaste(e: ClipboardEvent<HTMLTextAreaElement>) {
@@ -59,7 +62,24 @@ export function NewRequest({ state, team, actor, existingRequest, onDone, onCanc
     setItems(parsedItems)
     setShippingFee(result.shippingFee)
     setVatFee(result.vatFee)
-    setParseWarnings(result.warnings.map((w) => w.message))
+    setParseWarnings(result.warnings)
+    setParsedLines(cartText.split(/\r?\n/))
+  }
+
+  function addUnparsedLineAsItem(lineNo: number) {
+    const rawLine = parsedLines[lineNo - 1] ?? ''
+    const amount = parseAmount(rawLine) ?? 0
+    setItems((prev) => [
+      ...prev,
+      {
+        id: nextDraftItemId(),
+        name: rawLine.trim(),
+        qty: 1,
+        unitPrice: amount,
+        category: BUDGET_CATEGORIES[team.type][0],
+      },
+    ])
+    setParseWarnings((prev) => prev.filter((w) => !(w.code === 'UNPARSED_LINE' && w.line === lineNo)))
   }
 
   function updateItem(id: string, patch: Partial<Item>) {
@@ -137,7 +157,24 @@ export function NewRequest({ state, team, actor, existingRequest, onDone, onCanc
       {parseWarnings.length > 0 && (
         <div className="rounded border border-amber-300 bg-amber-50 p-2 text-sm">
           {parseWarnings.map((w, i) => (
-            <div key={i}>{w}</div>
+            <div key={i} className="flex items-center gap-2">
+              <span>{w.message}</span>
+              {w.code === 'UNPARSED_LINE' && w.line !== undefined && (
+                <>
+                  <span data-testid="unparsed-line-text" className="text-slate-500">
+                    {parsedLines[w.line - 1] ?? ''}
+                  </span>
+                  <button
+                    type="button"
+                    data-testid="add-unparsed-line"
+                    className="rounded border border-amber-400 px-2 py-0.5"
+                    onClick={() => addUnparsedLineAsItem(w.line!)}
+                  >
+                    품목으로 추가
+                  </button>
+                </>
+              )}
+            </div>
           ))}
         </div>
       )}

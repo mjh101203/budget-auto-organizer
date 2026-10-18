@@ -29,4 +29,29 @@ describe('NewRequest', () => {
     expect(screen.getAllByTestId('finding-warning').length).toBeGreaterThan(0)
     expect(screen.getByTestId('submit-button')).toBeDisabled()
   })
+
+  it('UNPARSED_LINE 경고에 원문과 [품목으로 추가] 버튼이 나오고 클릭하면 품목 행이 추가된다', () => {
+    const state = createSeedState()
+    const team = state.teams.find((t) => t.id === 'rne-3')!
+
+    render(
+      <NewRequest state={state} team={team} actor="김민준" onDone={vi.fn()} onCancel={vi.fn()} />,
+    )
+
+    const textarea = screen.getByTestId('cart-input')
+    const cartText = '12,000원\n브레드보드\n수량 1\n12,000원'
+    fireEvent.paste(textarea, {
+      clipboardData: {
+        getData: (type: string) => (type === 'text/plain' ? cartText : ''),
+      },
+    })
+    fireEvent.click(screen.getByTestId('parse-button'))
+
+    expect(screen.getAllByTestId('item-row')).toHaveLength(1)
+    expect(screen.getByTestId('unparsed-line-text')).toHaveTextContent('12,000원')
+    fireEvent.click(screen.getByTestId('add-unparsed-line'))
+
+    expect(screen.getAllByTestId('item-row')).toHaveLength(2)
+    expect(screen.queryByTestId('add-unparsed-line')).not.toBeInTheDocument()
+  })
 })

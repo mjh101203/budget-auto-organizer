@@ -33,7 +33,7 @@
 
 ## P1 — 완성도
 - [ ] 1. G마켓 어댑터(3-4단계). `real/gmarket-1.expected.json`은 이미 `_review`(에이전트 생성, 수량 1 가정) 표시로 존재 — 그 가정을 반영해 파서를 맞추고, 결과가 바뀌면 expected.json을 갱신한다. — 완료 기준: `gmarket-1.txt` → 기존/갱신된 expected.json과 일치 (spec: 01-cart-parser.md §3-4)
-- [ ] 2. `UNPARSED_LINE` 경고 줄을 품목표에서 [품목으로 추가] 클릭으로 수동 추가. — 완료 기준: UNPARSED_LINE이 있는 입력에서 클릭 시 품목 행 추가되는 테스트 (spec: 05-ui.md §새구매요청 2, 01-cart-parser.md §4)
+- [x] 2. `UNPARSED_LINE` 경고 줄을 품목표에서 [품목으로 추가] 클릭으로 수동 추가. — 완료 기준: UNPARSED_LINE이 있는 입력에서 클릭 시 품목 행 추가되는 테스트 (spec: 05-ui.md §새구매요청 2, 01-cart-parser.md §4)
 - [ ] 3. 팀 예산 집행 현황 엑셀(`src/export/layouts/budgetStatus.ts`, 시트 `예산현황`+`집행내역`) + 학생 홈 [예산현황 엑셀] 버튼. — 완료 기준: 시드 팀 데이터로 집행률·배정/승인/대기/잔액 셀 값 검증 테스트 (spec: 04-excel-export.md P1)
 - [ ] 4. 교사 화면 팀별 집행률 막대 2개(rne-3, club-robot). — 완료 기준: 교사 홈 렌더 시 두 팀의 집행률이 시드 수치로 표시되는 테스트 (spec: 05-ui.md §교사홈 P1)
 
