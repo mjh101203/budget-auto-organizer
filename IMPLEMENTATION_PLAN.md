@@ -1,12 +1,12 @@
 # IMPLEMENTATION PLAN
-> 마지막 갱신: 14:31 (build) · P0 23 / P1 4 / P2 3 (완료 2)
+> 마지막 갱신: 14:38 (build) · P0 22 / P1 4 / P2 3 (완료 3)
 
-현재 코드 상태: 스캐폴딩 + 테스트 파이프라인 완료 (Vite+React+TS+Tailwind v4, ESLint flat config, 폴더 구조, Vitest+Playwright, `npm run check` 전체 통과). 다음은 P0 3번(도메인 타입·money.ts)부터.
+현재 코드 상태: 스캐폴딩 + 테스트 파이프라인 + 도메인 타입/money.ts 완료. `npm run check` 전체 통과. 다음은 P0 4번(src/config/budget.ts)부터.
 
 ## P0 — 데모 필수 (없으면 발표 불가)
 - [x] 1. 프로젝트 스캐폴딩: Vite + React + TypeScript(strict) + Tailwind 초기화, `src/domain/ src/config/ src/export/ src/store/ src/ui/` 폴더 생성, ESLint 설정, `package.json`에 `dev/build/test` 스크립트. — 완료 기준: `npm install` 성공, `npx tsc --noEmit` 통과, `npx eslint .` 통과, `npx vite build` 성공 (spec: 00-overview.md 10장)
 - [x] 2. 테스트 파이프라인 배선: Vitest 설정(+placeholder 테스트 1개) + Playwright 설정(`npx playwright install chromium` 안내, `e2e/` 폴더, 더미 e2e 1개) + `package.json`에 `npm run check` = `tsc --noEmit && eslint . && vitest run && vite build && playwright test`. — 완료 기준: `npm run check` 전체 통과 (spec: 00-overview.md 10장, CLAUDE.md)
-- [ ] 3. 도메인 타입 정의 `src/domain/types.ts` (Team/Item/PurchaseRequest/AppState, specs/00 7장 그대로) + `src/domain/money.ts` (정수 원 연산, `toLocaleString('ko-KR')+'원'` 포맷 헬퍼). — 완료 기준: `vitest run src/domain/money` money 포맷 단위 테스트 통과 (spec: 00-overview.md §7)
+- [x] 3. 도메인 타입 정의 `src/domain/types.ts` (Team/Item/PurchaseRequest/AppState, specs/00 7장 그대로) + `src/domain/money.ts` (정수 원 연산, `toLocaleString('ko-KR')+'원'` 포맷 헬퍼). — 완료 기준: `vitest run src/domain/money` money 포맷 단위 테스트 통과 (spec: 00-overview.md §7)
 - [ ] 4. `src/config/budget.ts`: 예산 구분·항목(rne/club), 분류 키워드 묶음, 규정 수치(R3 300000, R4 500000, requireProductLink 등), 금지 키워드(R5/R6) — specs/02 표를 숫자 하드코딩 없이 옮긴다. — 완료 기준: config를 import하는 테스트에서 상수값 확인 (spec: 02-budget-rules.md)
 - [ ] 5. `src/domain/parser/normalize.ts` (1단계 정규화: 전각→반각, 금액/수량 표기, 배송비, 합계 줄 감지, 잡음 줄 제거). — 완료 기준: 01-cart-parser.md 1단계의 모든 표기 예시가 각각 테스트 케이스로 통과 (spec: 01-cart-parser.md §1)
 - [ ] 6. 형식 판별(tsv/line/block) + block 파서(3단계) `src/domain/parser/parseCart.ts`. — 완료 기준: `specs/fixtures/carts/demo-cart.txt` → `demo-cart.expected.json`과 일치 (품목 8개, 배송비 3000, declaredSubtotal 438000, declaredTotal 441000, warnings 없음) (spec: 01-cart-parser.md §2~3)
@@ -46,3 +46,4 @@
 ## 완료
 - P0-1 프로젝트 스캐폴딩 (iteration 5)
 - P0-2 테스트 파이프라인 배선 (iteration 5, stop-hook이 `npm run check` 실패를 잡아내서 같은 iteration에 이어서 완료)
+- P0-3 도메인 타입 `src/domain/types.ts` + `src/domain/money.ts` (iteration 6)
