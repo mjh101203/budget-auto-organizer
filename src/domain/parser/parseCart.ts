@@ -71,23 +71,30 @@ function parseBlockItems(entries: LineEntry[], warnings: ParseWarning[]): Parsed
     .filter((idx) => idx >= 0)
 
   const items: ParsedItem[] = []
+  const consumed = new Set<number>(nameIndices)
+
   nameIndices.forEach((startIdx, i) => {
     const endIdx = i + 1 < nameIndices.length ? nameIndices[i + 1] : entries.length
     const nameEntry = entries[startIdx]
-    let rest = entries.slice(startIdx + 1, endIdx)
+    const restIndices: number[] = []
+    for (let idx = startIdx + 1; idx < endIdx; idx++) restIndices.push(idx)
 
     let spec: string | undefined
-    if (rest.length > 0 && isOptionLine(rest[0].text)) {
-      spec = rest[0].text.replace(/^(옵션|규격)\s*[:：]\s*/, '')
-      rest = rest.slice(1)
+    let specIdx = -1
+    if (restIndices.length > 0 && isOptionLine(entries[restIndices[0]].text)) {
+      specIdx = restIndices[0]
+      spec = entries[specIdx].text.replace(/^(옵션|규격)\s*[:：]\s*/, '')
+      consumed.add(specIdx)
     }
 
-    const qtyEntry = rest.find((entry) => isQtyOnlyLine(entry.text))
-    const amountEntries = rest.filter((entry) => parseAmount(entry.text) !== undefined)
+    const remainingIndices = restIndices.filter((idx) => idx !== specIdx)
+    const qtyIdx = remainingIndices.find((idx) => isQtyOnlyLine(entries[idx].text))
+    const amountIndices = remainingIndices.filter((idx) => parseAmount(entries[idx].text) !== undefined)
 
     let qty: number
-    if (qtyEntry) {
-      qty = parseQty(qtyEntry.text) ?? 1
+    if (qtyIdx !== undefined) {
+      qty = parseQty(entries[qtyIdx].text) ?? 1
+      consumed.add(qtyIdx)
     } else {
       qty = 1
       warnings.push({
@@ -97,7 +104,7 @@ function parseBlockItems(entries: LineEntry[], warnings: ParseWarning[]): Parsed
       })
     }
 
-    if (amountEntries.length === 0) {
+    if (amountIndices.length === 0) {
       warnings.push({
         code: 'MISSING_PRICE',
         line: nameEntry.lineNo,
@@ -106,10 +113,15 @@ function parseBlockItems(entries: LineEntry[], warnings: ParseWarning[]): Parsed
       return
     }
 
-    const useSecond = amountEntries.length >= 2
-    const unitPrice = parseAmount(amountEntries[0].text) ?? 0
-    const amount = useSecond ? parseAmount(amountEntries[1].text) ?? 0 : unitPrice * qty
-    const amountLineNo = useSecond ? amountEntries[1].lineNo : amountEntries[0].lineNo
+    const useSecond = amountIndices.length >= 2
+    const unitPriceIdx = amountIndices[0]
+    const amountIdx = useSecond ? amountIndices[1] : amountIndices[0]
+    consumed.add(unitPriceIdx)
+    consumed.add(amountIdx)
+
+    const unitPrice = parseAmount(entries[unitPriceIdx].text) ?? 0
+    const amount = useSecond ? parseAmount(entries[amountIdx].text) ?? 0 : unitPrice * qty
+    const amountLineNo = entries[amountIdx].lineNo
 
     const reconciled = reconcileAmount(unitPrice, qty, amount, amountLineNo, warnings)
 
@@ -121,6 +133,17 @@ function parseBlockItems(entries: LineEntry[], warnings: ParseWarning[]): Parsed
       amount: reconciled.amount,
       sourceLine: nameEntry.lineNo,
     })
+  })
+
+  entries.forEach((entry, idx) => {
+    if (consumed.has(idx)) return
+    if (parseAmount(entry.text) !== undefined) {
+      warnings.push({
+        code: 'UNPARSED_LINE',
+        line: entry.lineNo,
+        message: `인식하지 못한 줄입니다 (${entry.lineNo}번째 줄)`,
+      })
+    }
   })
 
   return items

@@ -120,4 +120,56 @@ describe('parseCart — 안전성', () => {
       expect(() => parseCart(input)).not.toThrow()
     })
   })
+
+  it('수량×단가가 금액과 다르면 QTY_PRICE_MISMATCH를 내고, 나누어떨어지면 단가를 보정한다', () => {
+    const result = parseCart('배터리\n수량 2\n5,000원\n9,000원')
+    expect(result.warnings.some((w) => w.code === 'QTY_PRICE_MISMATCH')).toBe(true)
+    expect(result.items).toHaveLength(1)
+    expect(result.items[0]).toMatchObject({ qty: 2, unitPrice: 4500, amount: 9000 })
+  })
+
+  it('장바구니 표시 합계와 품목 합계가 다르면 TOTAL_MISMATCH를 낸다', () => {
+    const result = parseCart('브레드보드\n수량 1\n10,000원\n상품금액 20,000원')
+    expect(result.warnings.some((w) => w.code === 'TOTAL_MISMATCH')).toBe(true)
+  })
+
+  it('수량 줄이 없으면 수량 1 + MISSING_QTY 경고를 낸다', () => {
+    const result = parseCart('브레드보드\n12,000원')
+    expect(result.warnings).toEqual([{ code: 'MISSING_QTY', line: 1, message: '수량을 찾지 못해 1로 처리했습니다' }])
+    expect(result.items).toEqual([
+      expect.objectContaining({ name: '브레드보드', qty: 1, unitPrice: 12000, amount: 12000 }),
+    ])
+  })
+
+  it('금액이 없으면 그 품목은 만들지 않고 MISSING_PRICE 경고를 낸다', () => {
+    const result = parseCart('브레드보드\n수량 1\n\n와이어 커넥터\n수량 1\n3,000원')
+    expect(result.warnings.some((w) => w.code === 'MISSING_PRICE')).toBe(true)
+    expect(result.items).toHaveLength(1)
+    expect(result.items[0].name).toBe('와이어 커넥터')
+  })
+
+  it('품목·잡음·합계 어디에도 속하지 않는 금액 줄은 UNPARSED_LINE으로 표시한다', () => {
+    const result = parseCart('12,000원\n브레드보드\n수량 1\n12,000원')
+    expect(result.warnings).toEqual([{ code: 'UNPARSED_LINE', line: 1, message: '인식하지 못한 줄입니다 (1번째 줄)' }])
+    expect(result.items).toHaveLength(1)
+  })
+
+  it('랜덤 문자열 100개를 넣어도 throw하지 않는다 (퍼징)', () => {
+    const charset =
+      '가나다라마바사아자차카타파하 0123456789,.원₩=+-*xX×개수량옵션규격상품금액배송비결제예정금액[](){}:：　!@#$%' +
+      String.fromCharCode(9, 10, 13)
+    let seed = 42
+    const nextRandom = (): number => {
+      seed = (seed * 1103515245 + 12345) % 2147483648
+      return seed / 2147483648
+    }
+    for (let i = 0; i < 100; i++) {
+      const length = Math.floor(nextRandom() * 60)
+      let input = ''
+      for (let j = 0; j < length; j++) {
+        input += charset[Math.floor(nextRandom() * charset.length)]
+      }
+      expect(() => parseCart(input)).not.toThrow()
+    }
+  })
 })

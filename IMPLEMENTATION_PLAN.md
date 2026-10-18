@@ -1,7 +1,7 @@
 # IMPLEMENTATION PLAN
-> 마지막 갱신: 14:56 (build) · P0 17 / P1 4 / P2 3 (완료 8)
+> 마지막 갱신: 15:00 (build) · P0 16 / P1 4 / P2 3 (완료 9)
 
-현재 코드 상태: 스캐폴딩 + 테스트 파이프라인 + 도메인 타입/money.ts + config/budget.ts + parser/normalize.ts(1단계 정규화) + parser/format.ts(형식 판별, 헤더 셀 분류 export) + parser/parseCart.ts(block/tsv/line 파서 + 디바이스마트 전용 어댑터, demo-cart·tsv-sample·line-sample·devicemart-1/2/3 fixture 일치) 완료. `npm run check` 전체 통과. 다음은 P0 9번(4단계 검증: WarningCode별 테스트 + 퍼징)부터.
+현재 코드 상태: 스캐폴딩 + 테스트 파이프라인 + 도메인 타입/money.ts + config/budget.ts + parser/normalize.ts(1단계 정규화) + parser/format.ts(형식 판별, 헤더 셀 분류 export) + parser/parseCart.ts(block/tsv/line 파서 + 디바이스마트 전용 어댑터 + UNPARSED_LINE 탐지, demo-cart·tsv-sample·line-sample·devicemart-1/2/3 fixture 일치, WarningCode 7종 전부 단위 테스트 + 퍼징 테스트) 완료. `npm run check` 전체 통과. 다음은 P0 10번(링크 추출 `links.ts` + HTML 연동)부터.
 
 ## P0 — 데모 필수 (없으면 발표 불가)
 - [x] 1. 프로젝트 스캐폴딩: Vite + React + TypeScript(strict) + Tailwind 초기화, `src/domain/ src/config/ src/export/ src/store/ src/ui/` 폴더 생성, ESLint 설정, `package.json`에 `dev/build/test` 스크립트. — 완료 기준: `npm install` 성공, `npx tsc --noEmit` 통과, `npx eslint .` 통과, `npx vite build` 성공 (spec: 00-overview.md 10장)
@@ -12,7 +12,7 @@
 - [x] 6. 형식 판별(tsv/line/block) + block 파서(3단계) `src/domain/parser/parseCart.ts`. — 완료 기준: `specs/fixtures/carts/demo-cart.txt` → `demo-cart.expected.json`과 일치 (품목 8개, 배송비 3000, declaredSubtotal 438000, declaredTotal 441000, warnings 없음) (spec: 01-cart-parser.md §2~3)
 - [x] 7. line 파서(3-2단계) + tsv 파서. — 완료 기준: `line-sample.txt`/`tsv-sample.txt`가 각각 expected.json과 일치 (spec: 01-cart-parser.md §3-2)
 - [x] 8. 디바이스마트 어댑터(3-3단계). — 완료 기준: `real/devicemart-1.txt`, `devicemart-2.txt`(품목 2개, 부가세 3,470, 배송비 2,700, 경고 없음), `devicemart-3.txt` 전부 expected.json과 일치. 이 테스트는 절대 약화·skip 금지 (spec: 01-cart-parser.md §3-3)
-- [ ] 9. 4단계 검증: `QTY_PRICE_MISMATCH`/`TOTAL_MISMATCH`/`UNPARSED_LINE`/`EMPTY_INPUT`/`NO_ITEMS`/`MISSING_QTY`/`MISSING_PRICE` + `parseCart`가 어떤 입력에도 throw하지 않는 퍼징 테스트(랜덤 문자열 100개). — 완료 기준: 각 WarningCode에 대한 단위 테스트 + 퍼징 테스트 통과 (spec: 01-cart-parser.md §4)
+- [x] 9. 4단계 검증: `QTY_PRICE_MISMATCH`/`TOTAL_MISMATCH`/`UNPARSED_LINE`/`EMPTY_INPUT`/`NO_ITEMS`/`MISSING_QTY`/`MISSING_PRICE` + `parseCart`가 어떤 입력에도 throw하지 않는 퍼징 테스트(랜덤 문자열 100개). — 완료 기준: 각 WarningCode에 대한 단위 테스트 + 퍼징 테스트 통과 (spec: 01-cart-parser.md §4)
 - [ ] 10. 링크 추출 `src/domain/parser/links.ts` (`a[href]` 추출, 품명 매칭) + 붙여넣기 HTML 연동. — 완료 기준: `demo-cart.html`+`demo-cart.txt`를 같이 넣으면 8개 품목 전부 `https://shop.example/item/1`…`/8` url이 붙음 (spec: 01-cart-parser.md §3-5)
 - [ ] 11. `src/store/seed.ts`: specs/00 §8 그대로 (팀 A `rne-3`, 팀 B `club-robot`, REQ-0001~0003, nextSeq=4, 시드 품목 전부 `https://shop.example/seed/<n>` 링크 포함). — 완료 기준: 시드 로드 결과가 §8 수치와 모두 일치하는 테스트 (spec: 00-overview.md §8)
 - [ ] 12. `src/domain/classify.ts` 자동 분류(키워드 개수·동점 규칙·`기타`). — 완료 기준: 02-budget-rules.md §분류 예 5개 케이스(점퍼 케이블→소모품비, 릴레이 모듈→재료비, 배터리→소모품비, 서보모터→물품구입비, 센서공학입문→재료비(틀린 분류 의도적)) 테스트 통과 (spec: 02-budget-rules.md)
@@ -52,3 +52,4 @@
 - P0-6 형식 판별(`src/domain/parser/format.ts`) + block 파서(`src/domain/parser/parseCart.ts`), demo-cart fixture 일치 (iteration 9)
 - P0-7 line 파서(3-2단계, 마지막 원 금액 + x/수량 토큰 위치로 품명 추출) + tsv 파서(헤더 셀 타입 분류 후 열 매핑), tsv-sample/line-sample fixture 일치 (iteration 11)
 - P0-8 디바이스마트 어댑터(3-3단계): `주문상품`+`수량`+`상품금액` 세 단어가 모두 들어있는 헤더 줄로 감지 → 헤더 다음부터 `결제 예정금액` 값 줄까지만 읽고 그 앞뒤는 전부 버림. 마일리지/삭제/본사/택배/변경/건별배송비(선불·착불) 줄 필터링 후 `이름\t이름 / - / 수량 / + / 금액원` 순서로 품목 추출(이름은 첫 칸을 연속공백 축약), `상품 주문 금액`/`부가세`/`배송비`/`결제 예정금액` 라벨+다음 줄 금액으로 요약값 추출. devicemart-1/2/3 fixture 전부 expected.json과 일치 (iteration 12)
+- P0-9 4단계 검증: `parseBlockItems`가 각 이름 줄 블록에서 실제로 소비한 줄(옵션/수량/단가·금액 줄)을 `Set<number>`로 추적하도록 리팩터 → 블록 어디에도 소비되지 않았는데 금액 패턴이 있는 줄을 `UNPARSED_LINE`으로 표시(이전엔 이 경고가 아예 안 났음, 스펙 4단계 필수 항목). `QTY_PRICE_MISMATCH`/`TOTAL_MISMATCH`/`MISSING_QTY`/`MISSING_PRICE`/`UNPARSED_LINE` 각각 합성 입력 단위 테스트 + 시드 42 선형합동 PRNG로 랜덤 문자열 100개 생성해 throw 안 하는지 확인하는 퍼징 테스트 추가. 기존 demo-cart/devicemart 등 fixture는 모든 줄이 품목 블록에 정확히 소비돼서 회귀 없음. `npm run check` 전체 통과 (iteration 13)
