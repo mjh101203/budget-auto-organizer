@@ -316,6 +316,10 @@ function matchDevicemartLabel(text: string): DevicemartLabel | undefined {
   return DEVICEMART_LABELS.find(([pattern]) => pattern.test(trimmed))?.[1]
 }
 
+function isDevicemartDiscountLine(text: string): boolean {
+  return /^\d+(\.\d+)?%\s*\d[\d,]*\s*원/.test(text.trim())
+}
+
 function parseDevicemartCart(rawLines: string[], headerIdx: number): ParseResult {
   const warnings: ParseWarning[] = []
 
@@ -357,6 +361,17 @@ function parseDevicemartCart(rawLines: string[], headerIdx: number): ParseResult
         else declaredTotal = value
         i++
       }
+      continue
+    }
+
+    if (isDevicemartDiscountLine(entry.text) && items.length > 0) {
+      const discountedAmount = parseAmount(entry.text)
+      if (discountedAmount !== undefined) {
+        const lastItem = items[items.length - 1]
+        lastItem.amount = discountedAmount
+        lastItem.unitPrice = computeLineUnitPrice(discountedAmount, lastItem.qty, entry.lineNo, warnings)
+      }
+      i++
       continue
     }
 

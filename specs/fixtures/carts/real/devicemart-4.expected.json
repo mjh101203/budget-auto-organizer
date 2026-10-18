@@ -1,0 +1,25 @@
+{
+  "_review": "사람이 확인한 정답. 상품금액 칸에 정가(209,000원)와 할인 적용 금액(12% 184,000원)이 둘 다 나온다. 실제 금액은 할인 적용 금액이다. 배송비는 건별 '무료'와 요약 0원.",
+  "format": "block",
+  "items": [
+    {
+      "name": "아두이노 우노 Q 메탈 케이스 (투명 폴리카보네이트 덮개 포함)",
+      "qty": 1,
+      "unitPrice": 33300,
+      "amount": 33300,
+      "sourceLine": 62
+    },
+    {
+      "name": "Arduino UNO Q (4GB)",
+      "qty": 2,
+      "unitPrice": 92000,
+      "amount": 184000,
+      "sourceLine": 74
+    }
+  ],
+  "shippingFee": 0,
+  "vatFee": 21730,
+  "declaredSubtotal": 217300,
+  "declaredTotal": 239030,
+  "warnings": []
+}

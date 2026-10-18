@@ -1,7 +1,7 @@
 # IMPLEMENTATION PLAN
-> 마지막 갱신: 15:58 (build) · P0 25/26 / P1 4 / P2 3 (완료 25)
+> 마지막 갱신: 16:04 (build) · P0 25/26 / P1 5/6 / P2 3 (완료 27)
 
-현재 코드 상태: 도메인/파서/엑셀/UI 전부(위 이력 참고) 완료 + `e2e/demo.spec.ts`(specs/00 §6 데모 시나리오 전체 — 역할 전환·장바구니 붙여넣기·인식·규정검사·제출·교사승인·품의서 다운로드)까지 녹색. 실시간 지시(UI 최소기능+data-testid+데모 e2e)는 이번 iteration으로 완결. `npm run check` 전체(154 유닛 테스트 + e2e 2개) 통과. 남은 건 P0-24b(화면별 전용 컴포넌트 테스트 보강, 선택)와 P1/P2 뿐.
+현재 코드 상태: 도메인/파서/엑셀/UI 전부(위 이력 참고) 완료 + `e2e/demo.spec.ts`(specs/00 §6 데모 시나리오 전체 — 역할 전환·장바구니 붙여넣기·인식·규정검사·제출·교사승인·품의서 다운로드)까지 녹색. 실시간 지시(UI 최소기능+data-testid+데모 e2e, UNPARSED_LINE 수동 추가, 디바이스마트 할인율 줄 처리)는 각각 도착한 iteration으로 완결. `npm run check` 전체(161 유닛 테스트 + e2e 2개) 통과. 남은 건 P0-24b(화면별 전용 컴포넌트 테스트 보강, 선택)와 P1(G마켓 어댑터·예산현황 엑셀·교사 집행률)/P2 뿐.
 
 ## P0 — 데모 필수 (없으면 발표 불가)
 - [x] 1. 프로젝트 스캐폴딩: Vite + React + TypeScript(strict) + Tailwind 초기화, `src/domain/ src/config/ src/export/ src/store/ src/ui/` 폴더 생성, ESLint 설정, `package.json`에 `dev/build/test` 스크립트. — 완료 기준: `npm install` 성공, `npx tsc --noEmit` 통과, `npx eslint .` 통과, `npx vite build` 성공 (spec: 00-overview.md 10장)
@@ -32,6 +32,7 @@
 - [x] 25. 데모 시나리오 e2e 테스트 (`e2e/demo.spec.ts`, specs/00 §6 6단계 전부, chromium). — 완료 기준: `npm run e2e` (playwright) 통과 — 학생 김민준 홈 317,700원 → 장바구니 붙여넣기(텍스트+HTML) → 인식 8품목/441,000원 → R1 error+R3 warning → 오실로스코프 삭제 → 112,000원/244,300원 → 제출 REQ-0004 → 교사 최윤서 승인 → 학생 복귀 승인 상태/244,300원 → 품의서 엑셀 다운로드 (spec: 00-overview.md §6)
 
 ## P1 — 완성도
+- [x] 1b. 디바이스마트 어댑터: 할인율 줄(`12% 184,000원`) 처리 — 품목 금액 줄 다음에 할인율 줄이 오면 그 할인 적용 금액을 품목 amount로 쓰고 unitPrice=amount÷qty로 재계산 (실시간 지시, `devicemart-4` fixture). — 완료 기준: `devicemart-4.txt`가 `devicemart-4.expected.json`과 일치하고 devicemart-1~3/demo 기존 테스트 회귀 없음 (spec: 01-cart-parser.md §3-3, §가정)
 - [ ] 1. G마켓 어댑터(3-4단계). `real/gmarket-1.expected.json`은 이미 `_review`(에이전트 생성, 수량 1 가정) 표시로 존재 — 그 가정을 반영해 파서를 맞추고, 결과가 바뀌면 expected.json을 갱신한다. — 완료 기준: `gmarket-1.txt` → 기존/갱신된 expected.json과 일치 (spec: 01-cart-parser.md §3-4)
 - [x] 2. `UNPARSED_LINE` 경고 줄을 품목표에서 [품목으로 추가] 클릭으로 수동 추가. — 완료 기준: UNPARSED_LINE이 있는 입력에서 클릭 시 품목 행 추가되는 테스트 (spec: 05-ui.md §새구매요청 2, 01-cart-parser.md §4)
 - [ ] 3. 팀 예산 집행 현황 엑셀(`src/export/layouts/budgetStatus.ts`, 시트 `예산현황`+`집행내역`) + 학생 홈 [예산현황 엑셀] 버튼. — 완료 기준: 시드 팀 데이터로 집행률·배정/승인/대기/잔액 셀 값 검증 테스트 (spec: 04-excel-export.md P1)

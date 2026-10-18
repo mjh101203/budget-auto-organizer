@@ -10,6 +10,8 @@ import devicemart2ExpectedRaw from '../../../specs/fixtures/carts/real/devicemar
 import devicemart2Text from '../../../specs/fixtures/carts/real/devicemart-2.txt?raw'
 import devicemart3ExpectedRaw from '../../../specs/fixtures/carts/real/devicemart-3.expected.json?raw'
 import devicemart3Text from '../../../specs/fixtures/carts/real/devicemart-3.txt?raw'
+import devicemart4ExpectedRaw from '../../../specs/fixtures/carts/real/devicemart-4.expected.json?raw'
+import devicemart4Text from '../../../specs/fixtures/carts/real/devicemart-4.txt?raw'
 import tsvSampleExpectedRaw from '../../../specs/fixtures/carts/tsv-sample.expected.json?raw'
 import tsvSampleText from '../../../specs/fixtures/carts/tsv-sample.txt?raw'
 import { parseCart } from './parseCart'
@@ -118,6 +120,13 @@ describe('parseCart — 디바이스마트 실제 샘플 (절대 약화·skip �
     const expected = JSON.parse(devicemart3ExpectedRaw) as ExpectedResult
     const result = parseCart(devicemart3Text)
     assertMatchesFixture(result, expected)
+  })
+
+  it('devicemart-4.txt를 devicemart-4.expected.json과 동일하게 인식한다 (할인율 줄의 할인 적용 금액을 품목 금액으로 사용)', () => {
+    const expected = JSON.parse(devicemart4ExpectedRaw) as ExpectedResult
+    const result = parseCart(devicemart4Text)
+    assertMatchesFixture(result, expected)
+    expect(result.warnings).toEqual([])
   })
 })
 
