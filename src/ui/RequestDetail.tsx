@@ -67,9 +67,19 @@ export function RequestDetail({ state, request, team, isTeacher, actor, onStateC
 
   return (
     <div className="space-y-4">
-      <button type="button" className="text-sm text-slate-500" onClick={onBack}>
-        ← 뒤로
-      </button>
+      <div className="flex items-center justify-between print:hidden">
+        <button type="button" className="text-sm text-slate-500" onClick={onBack}>
+          ← 뒤로
+        </button>
+        <button
+          type="button"
+          data-testid="print-button"
+          className="rounded border border-slate-400 px-3 py-1 text-sm"
+          onClick={() => window.print()}
+        >
+          인쇄
+        </button>
+      </div>
       <h2 className="text-xl font-bold">
         <span data-testid="request-id">{request.id}</span>{' '}
         <span data-testid="status-badge">{statusLabel(request.status)}</span>
@@ -122,7 +132,7 @@ export function RequestDetail({ state, request, team, isTeacher, actor, onStateC
       </div>
 
       {request.status === 'rejected' && !isTeacher && (
-        <div className="rounded border border-red-300 bg-red-50 p-2 text-sm">
+        <div className="rounded border border-red-300 bg-red-50 p-2 text-sm print:hidden">
           반려 사유: {[...request.history].reverse().find((h) => h.action === 'reject')?.note ?? ''}
           <div>
             <button type="button" className="mt-2 rounded bg-sky-600 px-3 py-1 text-white" onClick={onResubmit}>
@@ -133,19 +143,29 @@ export function RequestDetail({ state, request, team, isTeacher, actor, onStateC
       )}
 
       {request.status === 'approved' && !isTeacher && (
-        <button type="button" data-testid="download-po" className="rounded bg-emerald-600 px-3 py-1 text-white" onClick={handleDownload}>
+        <button
+          type="button"
+          data-testid="download-po"
+          className="rounded bg-emerald-600 px-3 py-1 text-white print:hidden"
+          onClick={handleDownload}
+        >
           품의서 엑셀
         </button>
       )}
 
       {!isTeacher && (
-        <button type="button" data-testid="duplicate-request" className="rounded border border-slate-400 px-3 py-1" onClick={onDuplicate}>
+        <button
+          type="button"
+          data-testid="duplicate-request"
+          className="rounded border border-slate-400 px-3 py-1 print:hidden"
+          onClick={onDuplicate}
+        >
           지난번 주문 다시 담기
         </button>
       )}
 
       {request.status === 'submitted' && isTeacher && (
-        <div className="flex gap-2">
+        <div className="flex gap-2 print:hidden">
           <button type="button" data-testid="approve-button" className="rounded bg-emerald-600 px-3 py-1 text-white" onClick={handleApprove}>
             승인
           </button>
@@ -161,7 +181,7 @@ export function RequestDetail({ state, request, team, isTeacher, actor, onStateC
       )}
 
       {showRejectForm && (
-        <div className="rounded border border-slate-300 p-2 space-y-2">
+        <div className="rounded border border-slate-300 p-2 space-y-2 print:hidden">
           <textarea
             data-testid="reject-reason-input"
             placeholder="반려 사유"
@@ -174,7 +194,7 @@ export function RequestDetail({ state, request, team, isTeacher, actor, onStateC
         </div>
       )}
 
-      {actionError && <div className="text-sm text-red-600">{actionError}</div>}
+      {actionError && <div className="text-sm text-red-600 print:hidden">{actionError}</div>}
     </div>
   )
 }

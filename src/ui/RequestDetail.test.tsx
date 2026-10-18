@@ -73,4 +73,29 @@ describe('RequestDetail', () => {
     fireEvent.click(screen.getByTestId('duplicate-request'))
     expect(onDuplicate).toHaveBeenCalledTimes(1)
   })
+
+  it('[인쇄] 클릭 시 window.print가 호출된다', () => {
+    const state = createSeedState()
+    const request = state.requests.find((r) => r.id === 'REQ-0001')!
+    const team = state.teams.find((t) => t.id === request.teamId)!
+    const printSpy = vi.fn()
+    window.print = printSpy
+
+    render(
+      <RequestDetail
+        state={state}
+        request={request}
+        team={team}
+        isTeacher={false}
+        actor="김민준"
+        onStateChange={vi.fn()}
+        onResubmit={vi.fn()}
+        onDuplicate={vi.fn()}
+        onBack={vi.fn()}
+      />,
+    )
+
+    fireEvent.click(screen.getByTestId('print-button'))
+    expect(printSpy).toHaveBeenCalledTimes(1)
+  })
 })

@@ -1,7 +1,7 @@
 # IMPLEMENTATION PLAN
-> 마지막 갱신: 16:41 (build) · P0 26/26 / P1 6/6 / P2 2/3 (완료 34)
+> 마지막 갱신: 16:44 (build) · P0 26/26 / P1 6/6 / P2 3/3 (완료 35)
 
-현재 코드 상태: 도메인/파서/엑셀/UI 전부(위 이력 참고) 완료 + `e2e/demo.spec.ts`(specs/00 §6 데모 시나리오 전체 — 역할 전환·장바구니 붙여넣기·인식·규정검사·제출·교사승인·품의서 다운로드)까지 녹색. P1 전부 완료(G마켓 어댑터·UNPARSED_LINE 수동추가·디바이스마트 할인율/링크 보정·교사 집행률 막대·예산현황 엑셀). P2-1(예산 맞추기 추천)·P2-2(요청 복제)도 완료. `npm run check` 전체(178 유닛 테스트 + e2e 2개) 통과. 남은 건 P2(스트레치) 1개뿐(인쇄용 화면).
+현재 코드 상태: 도메인/파서/엑셀/UI 전부(위 이력 참고) 완료 + `e2e/demo.spec.ts`(specs/00 §6 데모 시나리오 전체 — 역할 전환·장바구니 붙여넣기·인식·규정검사·제출·교사승인·품의서 다운로드)까지 녹색. P0+P1+P2 전부 완료(G마켓 어댑터·UNPARSED_LINE 수동추가·디바이스마트 할인율/링크 보정·교사 집행률 막대·예산현황 엑셀·예산 맞추기 추천·요청 복제·인쇄용 화면). `npm run check` 전체(179 유닛 테스트 + e2e 2개) 통과. 계획상 남은 미완료 항목 없음.
 
 ## P0 — 데모 필수 (없으면 발표 불가)
 - [x] 1. 프로젝트 스캐폴딩: Vite + React + TypeScript(strict) + Tailwind 초기화, `src/domain/ src/config/ src/export/ src/store/ src/ui/` 폴더 생성, ESLint 설정, `package.json`에 `dev/build/test` 스크립트. — 완료 기준: `npm install` 성공, `npx tsc --noEmit` 통과, `npx eslint .` 통과, `npx vite build` 성공 (spec: 00-overview.md 10장)
@@ -44,7 +44,7 @@
 ## P2 — 스트레치 (시간 남으면)
 - [x] 1. 예산 맞추기 추천: 항목 잔액 초과 시 어떤 품목 수량을 줄이면 맞는지 제안. (spec: 00-overview.md §4 P2)
 - [x] 2. 요청 복제("지난번 주문 다시 담기"). (spec: 00-overview.md §4 P2)
-- [ ] 3. 인쇄용 화면(Ctrl+P → A4 가로). (spec: 00-overview.md §4 P2)
+- [x] 3. 인쇄용 화면(Ctrl+P → A4 가로). (spec: 00-overview.md §4 P2)
 
 ## 완료
 - P0-25 데모 시나리오 e2e(`e2e/demo.spec.ts`): `new DataTransfer()`+`new ClipboardEvent('paste', ...)`를 브라우저에서 직접 구성해 `cart-input`에 dispatch(텍스트+HTML 동시) → 인식 8품목/441,000원 → R1 error+R3 warning 확인 → 오실로스코프 행(8번째, `item-row` nth(7)) 삭제 → 용도 입력 → 제출 REQ-0004 → 역할 교사로 전환해 `pending-row`에서 승인 → 역할 학생 복귀해 재료비 잔액 244,300원 확인 → `download-po` 클릭해 다운로드 이벤트(.xlsx 파일명) 확인. `item-row`를 `hasText`로 품명 필터링하면 안 됨(품명이 `<input value>`라 Playwright의 텍스트 매칭에 안 잡힘) → 순서 기반 `.nth()`로 해결. e2e 전용 Node 타입(tsconfig.node.json, DOM lib 없음)이라 `DataTransfer`/`ClipboardEvent` 전역 타입이 없어서 `globalThis as unknown as {...}` 캐스팅으로 우회. `npm run check` 전체(154 테스트+e2e 2개) 통과 (iteration 27, 실시간 지시 완결)

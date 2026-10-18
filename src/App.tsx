@@ -53,7 +53,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 p-8 flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between print:hidden">
         <h1 className="text-2xl font-bold text-slate-900">예산 자동 정리 시스템</h1>
         <select
           data-testid="role-select"
@@ -125,7 +125,7 @@ function App() {
         )}
       </div>
 
-      <div>
+      <div className="print:hidden">
         <button
           type="button"
           data-testid="reset-demo"

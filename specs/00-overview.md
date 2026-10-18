@@ -135,3 +135,4 @@ interface AppState { version: 1; teams: Team[]; requests: PurchaseRequest[]; nex
 
 ## 가정
 <!-- 에이전트가 추가 -->
+- §4 P2 "인쇄용 화면"은 별도 화면/라우트를 새로 만들지 않고, 인쇄할 가치가 있는 화면인 요청 상세(RequestDetail)를 Tailwind `print:` variant로 인쇄용으로 전환했다(네비게이션·액션 버튼·폼은 `print:hidden`, 품목표/이력/요약은 그대로 노출). `@page { size: A4 landscape; margin: 12mm; }`로 Ctrl+P 시 A4 가로 출력.
