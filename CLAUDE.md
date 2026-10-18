@@ -45,3 +45,6 @@
 - `npm create vite@latest .`은 저장소에 이미 파일이 있으면(CLAUDE.md 등) 비대화형에서 멈춘다. 빈 임시 폴더에 스캐폴딩한 뒤 필요한 파일만 repo 루트로 옮기고 임시 폴더를 지운다.
 - Tailwind는 v4 + `@tailwindcss/vite` 플러그인 사용 (postcss.config 불필요, `src/index.css`에 `@import 'tailwindcss';` 한 줄만). vite.config.ts는 `vitest/config`의 `defineConfig`를 써서 `plugins`와 `test`(vitest) 옵션을 한 파일에서 같이 관리한다.
 - ESLint는 flat config(`eslint.config.js`) + `typescript-eslint` + `eslint-plugin-react-hooks`/`react-refresh`. create-vite 최신 템플릿은 기본 oxlint를 쓰므로 그건 삭제하고 ESLint로 교체해야 CLAUDE.md 요구사항(`npm run check`의 `eslint .`)과 맞는다.
+- `npm run check`는 stop-hook이 종료 시 그대로 재실행해서 검사한다. 테스트 파일이 하나도 없으면 vitest가 "No test files found"로 실패 코드를 뱉으니, 스캐폴딩 직후에도 placeholder 테스트 1개는 바로 커밋해야 한다.
+- `@playwright/test` 버전을 올리면 캐시된 브라우저 리비전 번호가 바뀌어 `Executable doesn't exist` 에러가 난다 — `npx playwright install chromium`을 다시 돌려서 맞는 리비전을 받으면 해결된다.
+- `playwright.config.ts`의 `webServer`는 `npm run preview`(vite preview, dist 서빙)를 쓴다. `npm run check` 순서가 `vite build` → `playwright test`라서 build 산출물이 이미 있는 상태로 preview가 뜬다.
