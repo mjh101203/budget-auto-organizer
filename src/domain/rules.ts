@@ -167,5 +167,23 @@ export function checkRequest(
     })
   }
 
+  // R13
+  if (draft.shippingFee < 0 || !Number.isInteger(draft.shippingFee)) {
+    findings.push({
+      ruleId: 'R13',
+      severity: 'error',
+      message: '배송비는 0 이상의 정수여야 합니다',
+    })
+  }
+
+  // R14
+  if (draft.vatFee < 0 || !Number.isInteger(draft.vatFee)) {
+    findings.push({
+      ruleId: 'R14',
+      severity: 'error',
+      message: '부가세는 0 이상의 정수여야 합니다',
+    })
+  }
+
   return findings
 }

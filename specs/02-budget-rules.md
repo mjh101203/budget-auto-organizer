@@ -59,6 +59,8 @@
 | R10 | 품목 0개 | error | 품목이 없습니다 |
 | R11 | 용도(purpose) 공백 | error | 용도를 입력하세요 |
 | R12 | 품목의 `url`이 비었거나 `http(s)://`로 시작하지 않음 (`config.requireProductLink`가 true일 때, 기본 true) | error | 상품 링크를 입력하세요 (학교 제출 필수) |
+| R13 | 배송비(shippingFee) < 0 또는 정수 아님 | error | 배송비는 0 이상의 정수여야 합니다 |
+| R14 | 부가세(vatFee) < 0 또는 정수 아님 | error | 부가세는 0 이상의 정수여야 합니다 |
 
 ## 수용 기준
 - 데모 시나리오 숫자가 그대로 나온다: 시드 rne-3에 데모 장바구니 8품목 → R1(재료비 84,700원 초과) error 1개 + R3 warning 1개, 다른 finding 없음 (R9 없음: 8품목 모두 기타 아님. 입력은 `demo-cart.txt` + `demo-cart.html`을 같이 붙여넣어 링크가 모두 채워진 상태)
@@ -73,3 +75,4 @@
 - `checkRequest` 시그니처는 `(team, requests, draft, options?)`로 구현(스펙 표기의 `now` 파라미터는 생략). R1~R12 중 현재 시각을 쓰는 규칙이 없어 들고 있어도 쓸 데가 없는 죽은 파라미터가 되기 때문. 향후 시간 기반 규칙이 추가되면 다시 넣는다. `options.excludeRequestId`는 재제출 시 자기 자신의 기존 pending 제외용(기존 `remainingAfterDraft`와 동일한 패턴).
 - R6(식비) 표의 메시지 예("R&E 연구비로 식비 집행 불가")는 rne 전용이고 club 쪽 문구는 스펙에 없어 직접 작성: club+행사·체험비(warning) "식비는 행사·체험비 지출 — 사유를 입력하세요", club+그 외(error) "동아리 활동비로 식비 집행 불가 (행사·체험비 항목만 가능)".
 - 분류 키워드 묶음(`CLASSIFY_KEYWORD_GROUPS`)은 한글 키워드 외에 영문 품명(Arduino, ESP32, Raspberry Pi, Servo Motor, Breadboard, Jumper Wire, Battery 등)도 매칭하도록 영문 키워드를 같이 둔다. `classifyItem`이 `toLowerCase()`로 비교하므로 대소문자·혼합 표기(ArduinoUNO, RASPBERRY 등)는 키워드를 소문자로만 등록해도 전부 매칭된다(실시간 지시, iteration 47).
+- 검수에서 배송비·부가세에 음수/소수를 넣어도 막히지 않는 버그가 발견돼 R13(배송비)·R14(부가세) error 규칙을 추가(실시간 지시, iteration 48). 기존 R1~R12는 번호를 건드리지 않고 뒤에 이어 붙였다. 두 필드를 하나의 규칙으로 합치지 않고 번호를 분리한 이유: 두 금액이 동시에 잘못돼도 각각 다른 메시지로 보여야 사용자가 어느 입력란이 문제인지 알 수 있어서.

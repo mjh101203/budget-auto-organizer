@@ -308,6 +308,48 @@ describe('R12 — 상품 링크 필수', () => {
   })
 })
 
+describe('R13 — 배송비', () => {
+  const draft = (shippingFee: number) => ({
+    items: [{ id: '1', name: 'a', qty: 1, unitPrice: 1_000, category: '재료비' }] as Item[],
+    shippingFee,
+    vatFee: 0,
+    purpose: 'p',
+  })
+
+  it('음수면 error', () => {
+    expect(checkRequest(teamA, [], draft(-500)).find((f) => f.ruleId === 'R13')!.severity).toBe('error')
+  })
+
+  it('정수가 아니면 error', () => {
+    expect(checkRequest(teamA, [], draft(1.5)).some((f) => f.ruleId === 'R13')).toBe(true)
+  })
+
+  it('0이면 걸리지 않는다', () => {
+    expect(checkRequest(teamA, [], draft(0)).some((f) => f.ruleId === 'R13')).toBe(false)
+  })
+})
+
+describe('R14 — 부가세', () => {
+  const draft = (vatFee: number) => ({
+    items: [{ id: '1', name: 'a', qty: 1, unitPrice: 1_000, category: '재료비' }] as Item[],
+    shippingFee: 0,
+    vatFee,
+    purpose: 'p',
+  })
+
+  it('음수면 error', () => {
+    expect(checkRequest(teamA, [], draft(-500)).find((f) => f.ruleId === 'R14')!.severity).toBe('error')
+  })
+
+  it('정수가 아니면 error', () => {
+    expect(checkRequest(teamA, [], draft(1.5)).some((f) => f.ruleId === 'R14')).toBe(true)
+  })
+
+  it('0이면 걸리지 않는다', () => {
+    expect(checkRequest(teamA, [], draft(0)).some((f) => f.ruleId === 'R14')).toBe(false)
+  })
+})
+
 describe('resubmit — excludeRequestId', () => {
   it('재제출이면 자기 자신의 기존 pending 요청을 제외하고 계산한다', () => {
     const existing: PurchaseRequest = {

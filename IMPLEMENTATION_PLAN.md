@@ -1,7 +1,7 @@
 # IMPLEMENTATION PLAN
-> 마지막 갱신: 16:44 (build) · P0 26/26 / P1 6/6 / P2 3/3 (완료 35)
+> 마지막 갱신: 17:09 (build) · P0 27/27 / P1 6/6 / P2 3/3 (완료 36)
 
-현재 코드 상태: 도메인/파서/엑셀/UI 전부(위 이력 참고) 완료 + `e2e/demo.spec.ts`(specs/00 §6 데모 시나리오 전체 — 역할 전환·장바구니 붙여넣기·인식·규정검사·제출·교사승인·품의서 다운로드)까지 녹색. P0+P1+P2 전부 완료(G마켓 어댑터·UNPARSED_LINE 수동추가·디바이스마트 할인율/링크 보정·교사 집행률 막대·예산현황 엑셀·예산 맞추기 추천·요청 복제·인쇄용 화면). `npm run check` 전체(179 유닛 테스트 + e2e 2개) 통과. 계획상 남은 미완료 항목 없음.
+현재 코드 상태: 도메인/파서/엑셀/UI 전부(위 이력 참고) 완료 + `e2e/demo.spec.ts`(specs/00 §6 데모 시나리오 전체 — 역할 전환·장바구니 붙여넣기·인식·규정검사·제출·교사승인·품의서 다운로드)까지 녹색. P0+P1+P2 전부 완료(G마켓 어댑터·UNPARSED_LINE 수동추가·디바이스마트 할인율/링크 보정·교사 집행률 막대·예산현황 엑셀·예산 맞추기 추천·요청 복제·인쇄용 화면·배송비/부가세 검증 R13/R14). `npm run check` 전체(188 유닛 테스트 + e2e 2개) 통과. 계획상 남은 미완료 항목 없음.
 
 ## P0 — 데모 필수 (없으면 발표 불가)
 - [x] 1. 프로젝트 스캐폴딩: Vite + React + TypeScript(strict) + Tailwind 초기화, `src/domain/ src/config/ src/export/ src/store/ src/ui/` 폴더 생성, ESLint 설정, `package.json`에 `dev/build/test` 스크립트. — 완료 기준: `npm install` 성공, `npx tsc --noEmit` 통과, `npx eslint .` 통과, `npx vite build` 성공 (spec: 00-overview.md 10장)
@@ -30,6 +30,7 @@
 - [x] 24. [데모 초기화](`reset-demo`) 동작 연결 + specs/05 §e2e용 data-testid 전체 실제 DOM에 부여 확인 (브라우저 alert/confirm 미사용). — 완료 기준: 전체 testid 목록이 코드에서 grep되고, 데모 초기화 클릭 시 localStorage가 시드로 복원되는 테스트 (spec: 05-ui.md §공통, §e2e용 data-testid)
 - [x] 24b. UI 컴포넌트 전용 테스트 보강 나머지: NewRequest 단위 컴포넌트 테스트(붙여넣기→인식→품목표 플로우). StudentHome/TeacherHome/RequestDetail은 완료. — 완료 기준: NewRequest 렌더/상호작용 테스트 1개 (spec: 05-ui.md)
 - [x] 25. 데모 시나리오 e2e 테스트 (`e2e/demo.spec.ts`, specs/00 §6 6단계 전부, chromium). — 완료 기준: `npm run e2e` (playwright) 통과 — 학생 김민준 홈 317,700원 → 장바구니 붙여넣기(텍스트+HTML) → 인식 8품목/441,000원 → R1 error+R3 warning → 오실로스코프 삭제 → 112,000원/244,300원 → 제출 REQ-0004 → 교사 최윤서 승인 → 학생 복귀 승인 상태/244,300원 → 품의서 엑셀 다운로드 (spec: 00-overview.md §6)
+- [x] 26. 검수 버그: 배송비·부가세에 음수/소수를 넣어도 규정 검사에 안 걸리고 제출이 활성화되던 버그 수정. `rules.ts`에 R13(배송비 <0 또는 비정수)·R14(부가세 <0 또는 비정수) error 규칙 추가(기존 error 있으면 제출 불가 로직 재사용, UI 변경 불필요) + `specs/02-budget-rules.md` 규정표·가정에 반영 + `rules.test.ts`에 -500/1.5/0 경계 케이스(실시간 지시, iteration 48). `public/favicon.svg` 추가 + `index.html`에 `<link rel="icon">` 연결(콘솔 404 해결).
 
 ## P1 — 완성도
 - [x] 1b. 디바이스마트 어댑터: 할인율 줄(`12% 184,000원`) 처리 — 품목 금액 줄 다음에 할인율 줄이 오면 그 할인 적용 금액을 품목 amount로 쓰고 unitPrice=amount÷qty로 재계산 (실시간 지시, `devicemart-4` fixture). — 완료 기준: `devicemart-4.txt`가 `devicemart-4.expected.json`과 일치하고 devicemart-1~3/demo 기존 테스트 회귀 없음 (spec: 01-cart-parser.md §3-3, §가정)
