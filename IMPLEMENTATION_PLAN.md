@@ -1,5 +1,5 @@
 # IMPLEMENTATION PLAN
-> 마지막 갱신: 16:04 (build) · P0 25/26 / P1 5/6 / P2 3 (완료 27)
+> 마지막 갱신: 16:11 (build) · P0 25/26 / P1 3/5 / P2 3 (완료 28)
 
 현재 코드 상태: 도메인/파서/엑셀/UI 전부(위 이력 참고) 완료 + `e2e/demo.spec.ts`(specs/00 §6 데모 시나리오 전체 — 역할 전환·장바구니 붙여넣기·인식·규정검사·제출·교사승인·품의서 다운로드)까지 녹색. 실시간 지시(UI 최소기능+data-testid+데모 e2e, UNPARSED_LINE 수동 추가, 디바이스마트 할인율 줄 처리)는 각각 도착한 iteration으로 완결. `npm run check` 전체(161 유닛 테스트 + e2e 2개) 통과. 남은 건 P0-24b(화면별 전용 컴포넌트 테스트 보강, 선택)와 P1(G마켓 어댑터·예산현황 엑셀·교사 집행률)/P2 뿐.
 
@@ -36,7 +36,7 @@
 - [ ] 1. G마켓 어댑터(3-4단계). `real/gmarket-1.expected.json`은 이미 `_review`(에이전트 생성, 수량 1 가정) 표시로 존재 — 그 가정을 반영해 파서를 맞추고, 결과가 바뀌면 expected.json을 갱신한다. — 완료 기준: `gmarket-1.txt` → 기존/갱신된 expected.json과 일치 (spec: 01-cart-parser.md §3-4)
 - [x] 2. `UNPARSED_LINE` 경고 줄을 품목표에서 [품목으로 추가] 클릭으로 수동 추가. — 완료 기준: UNPARSED_LINE이 있는 입력에서 클릭 시 품목 행 추가되는 테스트 (spec: 05-ui.md §새구매요청 2, 01-cart-parser.md §4)
 - [ ] 3. 팀 예산 집행 현황 엑셀(`src/export/layouts/budgetStatus.ts`, 시트 `예산현황`+`집행내역`) + 학생 홈 [예산현황 엑셀] 버튼. — 완료 기준: 시드 팀 데이터로 집행률·배정/승인/대기/잔액 셀 값 검증 테스트 (spec: 04-excel-export.md P1)
-- [ ] 4. 교사 화면 팀별 집행률 막대 2개(rne-3, club-robot). — 완료 기준: 교사 홈 렌더 시 두 팀의 집행률이 시드 수치로 표시되는 테스트 (spec: 05-ui.md §교사홈 P1)
+- [x] 4. 교사 화면 팀별 집행률 막대 2개(rne-3, club-robot). — 완료 기준: 교사 홈 렌더 시 두 팀의 집행률이 시드 수치로 표시되는 테스트 (spec: 05-ui.md §교사홈 P1)
 
 > 학교 실제 엑셀 양식 채우기(04-excel-export.md P1)는 `specs/fixtures/school-template.xlsx`가 없어 대상 제외. 파일이 생기면 플랜에 추가한다.
 

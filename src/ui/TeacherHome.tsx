@@ -1,6 +1,7 @@
 import type { AppState } from '../domain/types'
 import { formatWon, itemAmount, sumWon } from '../domain/money'
 import { checkRequest } from '../domain/rules'
+import { computeTeamBalances, totalBalance } from '../domain/budget'
 
 interface Props {
   state: AppState
@@ -15,6 +16,29 @@ export function TeacherHome({ state, onOpenRequest }: Props) {
 
   return (
     <div className="space-y-4">
+      <h2 className="text-xl font-bold">팀별 집행률</h2>
+      <div className="space-y-2">
+        {state.teams.map((team) => {
+          const total = totalBalance(computeTeamBalances(team, state.requests))
+          const rate = total.allocated > 0 ? Math.round((total.approved / total.allocated) * 100) : 0
+          return (
+            <div key={team.id} data-testid={`execution-rate-${team.id}`} className="text-sm">
+              <div className="flex justify-between">
+                <span>{team.shortName}</span>
+                <span data-testid={`execution-rate-value-${team.id}`}>
+                  {rate}% ({formatWon(total.approved)} / {formatWon(total.allocated)})
+                </span>
+              </div>
+              <div className="h-2 w-full rounded bg-slate-200">
+                <div
+                  className="h-2 rounded bg-blue-500"
+                  style={{ width: `${Math.min(100, rate)}%` }}
+                />
+              </div>
+            </div>
+          )
+        })}
+      </div>
       <h2 className="text-xl font-bold">승인 대기 목록</h2>
       <table className="w-full text-sm border-collapse">
         <thead>
